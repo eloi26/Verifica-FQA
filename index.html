@@ -5746,12 +5746,12 @@ const LAB_EXERCISES = [
     const m = String((e && (e.message || e.error_description)) || e || "");
     const c = String((e && (e.code || e.error_code)) || "");
     if(isNetErr(e)) return "Sem ligação à internet. Tenta de novo quando estiveres ligado.";
-    if(/Invalid login/i.test(m)) return "Código da turma, alcunha ou PIN incorretos.";
-    if(/already registered|already been registered|user_already_exists/i.test(m + c)) return "Já existe uma conta com esta alcunha nesta turma. Se és tu, usa «Já tenho conta»; se não, escolhe outra alcunha.";
+    if(/Invalid login/i.test(m)) return "Código da turma, nome ou PIN incorretos.";
+    if(/already registered|already been registered|user_already_exists/i.test(m + c)) return "Já existe um aluno com este nome nesta turma. Se és tu, usa «Já tenho conta»; se não, acrescenta mais uma letra do apelido (por exemplo, Ana Sa.).";
     if(/rate limit|over_.*_rate|too many/i.test(m + c)) return "Demasiadas tentativas seguidas. Espera um minuto e tenta de novo.";
     if(/código de turma inválido/i.test(m)) return "Código de turma não encontrado.";
-    if(/alcunha inválida/i.test(m)) return "Alcunha inválida (2 a 24 caracteres, sem @).";
-    if(/duplicate key|perfis_turma_id_alcunha/i.test(m)) return "Essa alcunha já existe na turma. Escolhe outra.";
+    if(/alcunha inválida/i.test(m)) return "Nome inválido (2 a 24 caracteres, sem @).";
+    if(/duplicate key|perfis_turma_id_alcunha/i.test(m)) return "Já existe um aluno com este nome na turma. Acrescenta mais uma letra do apelido (por exemplo, Ana Sa.).";
     if(/email.*(invalid|not valid)|invalid.*email/i.test(m + c)) return "O servidor recusou o endereço interno da conta. Avisa o professor (erro de configuração).";
     if(/signups? not allowed|signup.*disabled/i.test(m + c)) return "A criação de contas está desativada no servidor. Avisa o professor.";
     return "Não foi possível concluir (" + m.slice(0, 90) + ").";
@@ -5891,7 +5891,7 @@ const LAB_EXERCISES = [
     }
     if(!perfil){
       try{ await sb.auth.signOut(); }catch(e){}
-      const er = new Error("Conta sem turma associada. Entra com o código da turma e a alcunha."); er.plain = true; throw er;
+      const er = new Error("Conta sem turma associada. Entra com o código da turma e o nome."); er.plain = true; throw er;
     }
     conta.user = user; conta.perfil = perfil;
     switchStorage(user.id);
@@ -5993,8 +5993,8 @@ const LAB_EXERCISES = [
     const f = conta.f;
     const codigo = ctNormCode(f.codigo), alc = String(f.alcunha || "").trim();
     if(codigo.length < 4) return "Escreve o código da turma que o professor te deu.";
-    if(alc.length < 2 || alc.length > 24 || alc.indexOf("@") >= 0) return "A alcunha deve ter entre 2 e 24 caracteres e não pode ter @.";
-    if(!ctSlug(alc)) return "A alcunha deve ter pelo menos uma letra ou um número.";
+    if(alc.length < 2 || alc.length > 24 || alc.indexOf("@") >= 0) return "O nome deve ter entre 2 e 24 caracteres e não pode ter @.";
+    if(!ctSlug(alc)) return "O nome deve ter pelo menos uma letra.";
     if(!/^\d{6}$/.test(f.pin || "")) return "O PIN tem 6 dígitos (só números).";
     if(needPin2 && f.pin !== f.pin2) return "Os dois PIN não são iguais.";
     return "";
@@ -6041,7 +6041,7 @@ const LAB_EXERCISES = [
     }catch(err){
       conta.busy = false;
       conta.err = err && err.plain ? err.message : mapErr(err);
-      if(/Já existe uma conta|alcunha já existe|Essa alcunha/.test(conta.err)) conta.step = 1;
+      if(/Já existe um aluno/.test(conta.err)) conta.step = 1;
       render();
     }
   }
@@ -6077,9 +6077,9 @@ const LAB_EXERCISES = [
         <div class="ct-field"><label for="auth-codigo">Código da turma</label>
           <input id="auth-codigo" class="ct-mono" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="16" value="${ctEsc(f.codigo)}" placeholder="ex.: A1B2C3D4">
           <span class="ct-hint">Foi-te dado pelo professor.</span></div>
-        <div class="ct-field"><label for="auth-alcunha">Alcunha</label>
+        <div class="ct-field"><label for="auth-alcunha">Nome</label>
           <input id="auth-alcunha" type="text" autocomplete="username" maxlength="24" value="${ctEsc(f.alcunha)}">
-          <span class="ct-hint">Não uses o teu nome completo.</span></div>
+          <span class="ct-hint">Primeiro nome e inicial do apelido, por exemplo: Ana S.</span></div>
         <div class="ct-field"><label for="auth-pin">PIN de 6 dígitos</label>
           <input id="auth-pin" class="ct-pin ct-mono" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="${pin2 ? "new-password" : "current-password"}" value="${ctEsc(f.pin)}"></div>
         ${pin2 ? `<div class="ct-field"><label for="auth-pin2">Repete o PIN</label>
@@ -6093,7 +6093,7 @@ const LAB_EXERCISES = [
         <p class="ct-small">Esqueceste o PIN? Pede ao professor para o repor.</p>`;
     } else if(conta.tab === "primeira" && conta.step === 1){
       corpo = `<h1 class="ct-h1">Cria a tua conta</h1>
-        <p class="ct-muted">Precisas do código da turma. Escolhe uma alcunha e um PIN de 6 dígitos que consigas lembrar.</p>
+        <p class="ct-muted">Precisas do código da turma. Escreve o teu primeiro nome e a inicial do apelido, e escolhe um PIN de 6 dígitos que consigas lembrar.</p>
         ${tabs}${campos(true)}${err}
         <button type="button" class="btn primary ct-big" data-action="conta-continuar" data-primary ${dis}>${conta.busy ? "A verificar…" : "Continuar"}</button>`;
     } else if(conta.tab === "primeira"){
@@ -6101,10 +6101,10 @@ const LAB_EXERCISES = [
         <h1 class="ct-h1">O que guardamos sobre ti</h1>
         <div class="ct-priv">
           <div class="ct-priv-t good">Guardamos</div>
-          <ul><li>a tua alcunha e a tua turma;</li>
+          <ul><li>o teu primeiro nome, a inicial do apelido e a tua turma;</li>
               <li>que exercícios resolveste, a opção ou o valor que respondeste, se acertaste e quando;</li>
               <li>se viste a resolução e a tua autoavaliação nas respostas abertas;</li>
-              <li>um endereço interno gerado a partir da alcunha, só para o início de sessão (não é um email real).</li></ul>
+              <li>um endereço interno gerado a partir do teu nome, só para o início de sessão (não é um email real).</li></ul>
           <hr>
           <div class="ct-priv-t bad">Não guardamos</div>
           <ul><li>o teu nome completo, email ou contactos;</li>
