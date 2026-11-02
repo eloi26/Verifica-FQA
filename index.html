@@ -634,6 +634,24 @@
   .ct-fa-t{ font-size:0.88rem; line-height:1.4; }
   .ct-fa-m{ font-size:0.76rem; color:var(--ink-soft); margin-top:3px; }
   @media (max-width:480px){ .ct-card{ padding:18px 16px; } .ct-h1{ font-size:1.45rem; } }
+  .ct-sel-s{ min-width:110px; }
+  .ct-count{ display:inline-block; min-width:22px; padding:1px 8px; border-radius:999px; background:var(--physics-soft); color:var(--physics-ink); font:700 0.78rem var(--font-mono); text-align:center; vertical-align:middle; }
+  .ct-inat{ margin:6px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:2px; }
+  .ct-inat li{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; padding:6px 12px; background:var(--paper-raised); border:1px solid var(--line); border-radius:10px; }
+  .ct-table .ct-nm .ct-link{ font-weight:700; }
+  .ct-days{ display:flex; gap:3px; align-items:flex-end; overflow-x:auto; padding:10px 12px; background:var(--paper-raised); border:1px solid var(--line); border-radius:12px; }
+  .ct-day{ flex:1 0 20px; display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .ct-day-n{ font:600 0.7rem var(--font-mono); height:14px; color:var(--ink-soft); }
+  .ct-day-b{ display:flex; align-items:flex-end; width:100%; height:64px; background:var(--paper); border-radius:4px; overflow:hidden; }
+  .ct-day-b i{ display:block; width:100%; background:var(--physics); border-radius:4px 4px 0 0; }
+  .ct-day-l{ font:500 0.65rem var(--font-mono); color:var(--ink-faint); text-align:center; line-height:1.25; }
+  .ct-pcell{ display:flex; align-items:center; gap:8px; min-width:130px; }
+  .ct-pbar{ flex:1; height:8px; background:var(--paper); border-radius:4px; overflow:hidden; min-width:70px; }
+  .ct-pbar i{ display:block; height:100%; background:var(--physics); }
+  .ct-pbar i.low{ background:var(--bad); }
+  .ct-erros-sum{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding:10px 14px; margin:14px 0 4px; background:var(--physics-soft); border-radius:10px; font-size:0.9rem; }
+  .ct-eh{ font:700 0.95rem var(--font-body); color:var(--ink-soft); margin:20px 0 8px; display:flex; gap:8px; align-items:center; }
+  .ct-table .ct-nm{ white-space:normal; min-width:150px; }
 </style>
 
 <div class="wrap">
@@ -4520,6 +4538,7 @@ const LAB_EXERCISES = [
         : "";
       quickActionsEl.innerHTML = `
         <button class="btn primary" data-action="random">🎲 Prática rápida</button>
+        ${contaErrosBtn()}
         ${backBtn}
         ${filterNote}
         ${helperNote}`;
@@ -4747,7 +4766,7 @@ const LAB_EXERCISES = [
           ${q.type==="open" ? "Marcaste este exercício como não acertado — revê a resolução com calma." : "Resposta incorreta."}
           ${q.type==="numeric" ? ` A resposta correta é <strong>${q.answer}${q.unit?(" "+q.unit):""}</strong>.` : ""}
           <div class="expl">${q.expl}</div>
-        </div>`;
+        </div>${ui.view==="erros" ? `<div class="q-actions"><button class="btn ghost" data-action="retry" data-qid="${q.id}">Tentar de novo</button></div>` : ""}`;
       } else if(rec.attempts < 2 || ui.continuing[q.id]){
         // 1ª tentativa errada, ou escolheu "Tentar de novo" no ecrã de escolha: pode responder já.
         feedback = `<div class="feedback incorrect">Resposta incorreta. Tenta outra vez.</div>`;
@@ -5296,6 +5315,7 @@ const LAB_EXERCISES = [
     if(ui.mode==="plano"){ renderPlanoHome(); return; }
     if(ui.mode==="lab"){ renderLabHome(); return; }
     if(ui.view==="home") renderHome();
+    else if(ui.view==="erros") contaRenderErros();
     else renderTopic(ui.view);
   }
 
@@ -5730,7 +5750,7 @@ const LAB_EXERCISES = [
     queue: [], flushing: false, lastErr: "",
     offerImport: 0,
     prof: { turmas: [], turmaId: null, alunos: [], rows: [], loading: false, err: "", msg: "", showNew: false,
-            form: { nome: "", ano: ctAnoLetivo() }, confirm: null, loadedAt: null, pinMsg: "" }
+            form: { nome: "", ano: ctAnoLetivo() }, confirm: null, loadedAt: null, pinMsg: "", sel: null, inatDias: ctLoadInat() }
   };
 
   /* ---------- utilitários ---------- */
@@ -5759,6 +5779,7 @@ const LAB_EXERCISES = [
     if(/signups? not allowed|signup.*disabled/i.test(m + c)) return "A criação de contas está desativada no servidor. Avisa o professor.";
     return "Não foi possível concluir (" + m.slice(0, 90) + ").";
   }
+  function ctLoadInat(){ try{ const n = parseInt(localStorage.getItem("fqa_conta_inat_dias"), 10); return [3, 7, 14, 30].indexOf(n) >= 0 ? n : 7; }catch(e){ return 7; } }
   function ctSaveLS(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
   function ctLoadLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 
@@ -6193,6 +6214,7 @@ const LAB_EXERCISES = [
     }
     sortRows(P.rows);
     P.loadedAt = new Date();
+    if(P.sel && !P.alunos.some(a => a.id === P.sel)) P.sel = null;
   }
   function profCompute(){
     const P = conta.prof;
@@ -6225,7 +6247,8 @@ const LAB_EXERCISES = [
         if(!fraco || pct < fraco.pct || (pct === fraco.pct && o.n > fraco.n)) fraco = { pct: pct, n: o.n, title: o.t.title };
       });
       return { id: a.id, alcunha: a.alcunha, certos: certos, tentados: tentados, nT: nT, nC: nC,
-               pct: nT ? Math.round(100 * nC / nT) : null, ultimo: ultimo, streak: streakOf(rb.activity), fraco: fraco };
+               pct: nT ? Math.round(100 * nC / nT) : null, ultimo: ultimo, streak: streakOf(rb.activity), fraco: fraco,
+               diasSem: ultimo ? ctDiasDesde(ultimo) : null };
     });
     const sete = Date.now() - 7 * 86400000;
     const ativos = lista.filter(s => s.ultimo >= sete).length;
@@ -6233,16 +6256,128 @@ const LAB_EXERCISES = [
       .filter(x => x.n >= 3 && x.e > 0).sort((a, b) => (b.pct - a.pct) || (b.n - a.n)).slice(0, 10);
     return { lista: lista, ativos: ativos, totalT: totalT, pct: totalT ? Math.round(100 * totalC / totalT) : null, top: top };
   }
+  function ctDiasDesde(ts){
+    const a = new Date(ts), b = new Date();
+    a.setHours(0, 0, 0, 0); b.setHours(0, 0, 0, 0);
+    return Math.max(0, Math.round((b - a) / 86400000));
+  }
+  function ctHa(n){ return n === 0 ? "hoje" : (n === 1 ? "ontem" : "há " + n + " dias"); }
   function ctFmtData(ts){
     if(!ts) return "—";
     const d = new Date(ts), p = n => String(n).padStart(2, "0");
     return p(d.getDate()) + "/" + p(d.getMonth() + 1) + "/" + d.getFullYear() + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+
+  /* ---------- detalhe de um aluno ---------- */
+  function ctTxt(q){
+    return q ? String(q.prompt || "").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim() : "";
+  }
+  function profAluno(id){
+    const P = conta.prof;
+    const al = P.alunos.find(a => a.id === id); if(!al) return null;
+    const rows = P.rows.filter(r => r.aluno_id === id);
+    const rb = rebuild(rows);
+    const topicos = {}, porEx = {}, dias = {};
+    let nT = 0, nC = 0, ultimo = 0;
+    rows.forEach(r => {
+      if(r.resposta !== "_import"){ const ts = Date.parse(r.em); if(ts > ultimo) ultimo = ts; }
+      if(r.resposta === "_retry" || r.resposta === "_import") return;
+      if(r.certa !== true && r.certa !== false) return;
+      nT++; if(r.certa) nC++;
+      const dk = new Date(r.em).toDateString(); dias[dk] = (dias[dk] || 0) + 1;
+      const t = TOPIC_OF.get(r.exercicio_id);
+      if(t){
+        const o = topicos[t.id] || (topicos[t.id] = { t: t, seq: [], tent: 0, certos: 0, ultimo: 0 });
+        o.seq.push(r.certa ? 1 : 0);
+        const ts = Date.parse(r.em); if(ts > o.ultimo) o.ultimo = ts;
+      }
+      const f = porEx[r.exercicio_id] || (porEx[r.exercicio_id] = { n: 0, e: 0, ultimo: 0 });
+      f.n++; if(!r.certa) f.e++;
+      const ts2 = Date.parse(r.em); if(ts2 > f.ultimo) f.ultimo = ts2;
+    });
+    let certos = 0, tentados = 0;
+    Object.keys(rb.solved).forEach(k => {
+      tentados++;
+      const ok = rb.solved[k].status === "correct"; if(ok) certos++;
+      const t = TOPIC_OF.get(k);
+      if(t && topicos[t.id]){ topicos[t.id].tent++; if(ok) topicos[t.id].certos++; }
+    });
+    const temas = Object.keys(topicos).map(k => {
+      const o = topicos[k], n = o.seq.length, c = o.seq.reduce((a, b) => a + b, 0);
+      let tend = null;
+      if(n >= 8){
+        const rec = o.seq.slice(-5), ant = o.seq.slice(0, -5);
+        const pr = 100 * rec.reduce((a, b) => a + b, 0) / rec.length, pa = 100 * ant.reduce((a, b) => a + b, 0) / ant.length;
+        tend = pr - pa >= 15 ? "up" : (pr - pa <= -15 ? "down" : "flat");
+      }
+      return { t: o.t, n: n, c: c, pct: Math.round(100 * c / n), tent: o.tent, certos: o.certos, ultimo: o.ultimo, tend: tend };
+    }).sort((a, b) => (a.pct - b.pct) || (b.n - a.n));
+    const erros = Object.keys(porEx).filter(k => porEx[k].e > 0).map(k => ({
+      id: k, n: porEx[k].n, e: porEx[k].e, ainda: !!(rb.solved[k] && rb.solved[k].status === "incorrect"), ultimo: porEx[k].ultimo
+    })).sort((a, b) => (Number(b.ainda) - Number(a.ainda)) || (b.e - a.e) || (b.n - a.n)).slice(0, 10);
+    const serie = [];
+    for(let i = 13; i >= 0; i--){
+      const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - i);
+      serie.push({ d: d, n: dias[d.toDateString()] || 0 });
+    }
+    return { al: al, nT: nT, nC: nC, certos: certos, tentados: tentados, ultimo: ultimo, streak: streakOf(rb.activity),
+             pct: nT ? Math.round(100 * nC / nT) : null, temas: temas, erros: erros, serie: serie, total14: serie.reduce((a, b) => a + b.n, 0) };
+  }
+  function contaRenderAluno(P, turma, errH, msgH){
+    const D = profAluno(P.sel);
+    if(!D){ P.sel = null; return null; }
+    const kpi = `<div class="ct-kpis">
+        <div class="ct-kpi"><div class="n">${D.certos}/${D.tentados}</div><div class="l">Exercícios certos</div></div>
+        <div class="ct-kpi"><div class="n">${D.pct == null ? "—" : D.pct + "%"}</div><div class="l">Tentativas certas</div></div>
+        <div class="ct-kpi"><div class="n">${D.ultimo ? ctHa(ctDiasDesde(D.ultimo)) : "—"}</div><div class="l">Último acesso</div></div>
+        <div class="ct-kpi"><div class="n">${D.streak}</div><div class="l">Dias seguidos</div></div>
+      </div>`;
+    const max = Math.max(1, ...D.serie.map(x => x.n));
+    const wd = ["D", "S", "T", "Q", "Q", "S", "S"], p2 = n => String(n).padStart(2, "0");
+    const barras = D.serie.map(x => `<div class="ct-day" title="${p2(x.d.getDate())}/${p2(x.d.getMonth() + 1)}: ${x.n} tentativa${x.n === 1 ? "" : "s"}">
+        <span class="ct-day-n">${x.n || ""}</span>
+        <span class="ct-day-b"><i style="height:${Math.round(100 * x.n / max)}%"></i></span>
+        <span class="ct-day-l">${wd[x.d.getDay()]}<br>${p2(x.d.getDate())}</span></div>`).join("");
+    const atividade = D.total14
+      ? `<div class="ct-days" role="img" aria-label="Tentativas por dia nos últimos 14 dias: ${D.total14} no total">${barras}</div>`
+      : `<p class="ct-muted">Sem tentativas nos últimos 14 dias.</p>`;
+    const tendTxt = { up: "▲ a melhorar", down: "▼ a piorar", flat: "◆ estável" };
+    const linhasT = D.temas.map(x => `<tr>
+        <td class="ct-nm">${ctEsc(x.t.title)}</td>
+        <td class="ct-pcell"><span class="ct-pbar"><i class="${x.pct < 50 ? "low" : ""}" style="width:${x.pct}%"></i></span><b>${x.pct}%</b></td>
+        <td class="num">${x.c}/${x.n}</td><td class="num">${x.certos}/${x.tent}</td>
+        <td>${x.tend ? tendTxt[x.tend] : '<span class="ct-muted">—</span>'}</td><td>${ctFmtData(x.ultimo).slice(0, 10)}</td></tr>`).join("");
+    const temas = D.temas.length ? `<div class="ct-tablewrap"><table class="ct-table">
+        <thead><tr><th>Tema</th><th>% certas</th><th class="num">Tentativas certas</th><th class="num">Exercícios certos</th><th>Tendência</th><th>Último</th></tr></thead>
+        <tbody>${linhasT}</tbody></table></div>
+        <p class="ct-small">Ordenado do tema mais fraco para o mais forte. A tendência compara as últimas 5 tentativas com as anteriores (só com 8 ou mais tentativas).</p>`
+      : `<p class="ct-muted">Ainda não há tentativas.</p>`;
+    const erros = D.erros.length ? `<ol class="ct-falha">${D.erros.map(x => {
+        const q = Q_BY_ID.get(x.id), t = TOPIC_OF.get(x.id), txt = ctTxt(q).slice(0, 110);
+        return `<li><div class="ct-fa-t">${ctEsc(txt)}${ctTxt(q).length > 110 ? "…" : ""}</div>
+          <div class="ct-fa-m">${t ? ctEsc(t.title) + " · " : ""}<span class="ct-mono">${ctEsc(x.id)}</span> · errou <b>${x.e}</b> em ${x.n} · ${x.ainda ? "<b>ainda por acertar</b>" : "já acertou depois"}</div></li>`;
+      }).join("")}</ol>` : `<p class="ct-muted">Ainda não errou nenhum exercício.</p>`;
+    return `<div class="ct-panel">
+        <div class="ct-head"><div class="ct-row"><button type="button" class="btn ghost" data-action="conta-aluno-fechar">← Voltar à turma</button></div>
+          <div class="ct-row"><button type="button" class="btn ghost" data-action="conta-recarregar" ${P.loading ? "disabled" : ""}>${P.loading ? "A atualizar…" : "↻ Atualizar"}</button>
+            <button type="button" class="btn" data-action="conta-csv-aluno" data-id="${ctEsc(D.al.id)}">Tentativas deste aluno (.csv)</button></div></div>
+        <h1 class="ct-h1">${ctEsc(D.al.alcunha)}</h1>
+        <p class="ct-small">${turma ? ctEsc(turma.nome) + " · " : ""}${P.loadedAt ? "atualizado às " + ctFmtData(P.loadedAt.getTime()).slice(11) : ""}</p>
+        ${errH}${msgH}${kpi}
+        <h2 class="ct-h2">Atividade nos últimos 14 dias</h2>${atividade}
+        <h2 class="ct-h2">Evolução por tema</h2>${temas}
+        <h2 class="ct-h2">Exercícios com mais erros</h2>${erros}</div>`;
   }
   function contaRenderTurma(){
     document.body.classList.remove("auth-mode");
     const P = conta.prof, el = document.getElementById("app");
     if(!contaIsProf()){ el.innerHTML = ""; return; }
     const turma = P.turmas.find(t => t.id === P.turmaId) || null;
+    if(P.sel && turma && !(P.loading && !P.alunos.length)){
+      const errS = P.err ? `<div class="ct-err" role="alert">${ctEsc(P.err)}</div>` : "";
+      const h = contaRenderAluno(P, turma, errS, "");
+      if(h){ el.innerHTML = h; return; }
+    }
     const errH = P.err ? `<div class="ct-err" role="alert">${ctEsc(P.err)}</div>` : "";
     const msgH = P.msg ? `<div class="ct-ok" role="status">${ctEsc(P.msg)}</div>` : "";
     const pinH = P.pinMsg ? `<div class="ct-pinmsg" role="status">${P.pinMsg}</div>` : "";
@@ -6267,7 +6402,7 @@ const LAB_EXERCISES = [
       const linhas = C.lista.map(s => {
         const cf = P.confirm && P.confirm.id === s.id ? P.confirm.kind : "";
         return `<tr>
-          <td class="ct-nm">${ctEsc(s.alcunha)}</td>
+          <td class="ct-nm"><button type="button" class="ct-link" data-action="conta-aluno" data-id="${ctEsc(s.id)}" title="Ver o detalhe deste aluno">${ctEsc(s.alcunha)}</button></td>
           <td class="num">${s.certos}</td><td class="num">${s.tentados}</td>
           <td class="num">${s.pct == null ? "—" : s.pct + "%"}</td><td class="num">${s.nT}</td>
           <td>${ctFmtData(s.ultimo)}</td><td class="num">${s.streak}</td>
@@ -6280,8 +6415,19 @@ const LAB_EXERCISES = [
       const tabela = C.lista.length ? `<div class="ct-tablewrap"><table class="ct-table">
           <thead><tr><th>Aluno</th><th class="num">Certos</th><th class="num">Tentados</th><th class="num">% certas</th><th class="num">Tentativas</th><th>Último acesso</th><th class="num">Dias seg.</th><th>Tema mais fraco</th><th></th></tr></thead>
           <tbody>${linhas}</tbody></table></div>
-          <p class="ct-small">«Certos» e «Tentados» contam exercícios distintos; «% certas» conta tentativas.</p>`
+          <p class="ct-small">Clica no nome de um aluno para ver o detalhe. «Certos» e «Tentados» contam exercícios distintos; «% certas» conta tentativas.</p>`
         : `<p class="ct-muted">Ainda não há alunos nesta turma. Dá-lhes o código <b class="ct-mono">${ctEsc(turma.codigo)}</b> para criarem conta.</p>`;
+      const inativosH = function(C){
+        const lim = P.inatDias;
+        const l = C.lista.filter(s => !s.ultimo || s.diasSem > lim)
+          .sort((a, b) => (a.ultimo || 0) - (b.ultimo || 0));
+        const opts = [3, 7, 14, 30].map(n => `<option value="${n}" ${n === lim ? "selected" : ""}>${n} dias</option>`).join("");
+        const lista = l.length ? `<ul class="ct-inat">${l.map(s => `<li><button type="button" class="ct-link" data-action="conta-aluno" data-id="${ctEsc(s.id)}">${ctEsc(s.alcunha)}</button>
+            <span class="ct-muted">${s.ultimo ? "último acesso " + ctHa(s.diasSem) + " (" + ctFmtData(s.ultimo).slice(0, 10) + ")" : "ainda sem tentativas"}</span></li>`).join("")}</ul>`
+          : `<p class="ct-muted">Todos os alunos tiveram atividade nos últimos ${lim} dias.</p>`;
+        return `<h2 class="ct-h2">Sem atividade <span class="ct-count">${l.length}</span></h2>
+          <div class="ct-row"><label for="ct-inat-sel" class="ct-small">Mostrar quem não tentou exercícios há mais de</label><select id="ct-inat-sel" class="ct-sel ct-sel-s">${opts}</select></div>${lista}`;
+      };
       const falh = C.top.length ? `<ol class="ct-falha">${C.top.map(x => {
           const q = Q_BY_ID.get(x.id), t = TOPIC_OF.get(x.id);
           const txt = q ? String(q.prompt || "").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim().slice(0, 110) : x.id;
@@ -6291,6 +6437,7 @@ const LAB_EXERCISES = [
       corpo = `<div class="ct-codebox">Código da turma <b class="ct-mono" id="ct-code">${ctEsc(turma.codigo)}</b>
           <button type="button" class="ct-mini" data-action="conta-copiar-codigo">Copiar</button></div>
         ${kpi}
+        ${C.lista.length ? inativosH(C) : ""}
         <h2 class="ct-h2">Alunos</h2>${pinH}${tabela}
         <h2 class="ct-h2">Onde a turma mais falha</h2>${falh}
         <h2 class="ct-h2">Exportar para Excel</h2>
@@ -6331,19 +6478,20 @@ const LAB_EXERCISES = [
   function exportResumo(){
     const P = conta.prof, t = P.turmas.find(x => x.id === P.turmaId); if(!t) return;
     const C = profCompute();
-    const rows = [["Aluno", "Turma", "Exercícios certos", "Exercícios tentados", "Tentativas", "Tentativas certas", "% certas", "Último acesso", "Dias seguidos", "Tema mais fraco"]];
-    C.lista.forEach(s => rows.push([s.alcunha, t.nome, s.certos, s.tentados, s.nT, s.nC, s.pct == null ? "" : s.pct, s.ultimo ? ctFmtData(s.ultimo) : "", s.streak, s.fraco ? s.fraco.title : ""]));
+    const rows = [["Aluno", "Turma", "Exercícios certos", "Exercícios tentados", "Tentativas", "Tentativas certas", "% certas", "Último acesso", "Dias sem atividade", "Dias seguidos", "Tema mais fraco"]];
+    C.lista.forEach(s => rows.push([s.alcunha, t.nome, s.certos, s.tentados, s.nT, s.nC, s.pct == null ? "" : s.pct, s.ultimo ? ctFmtData(s.ultimo) : "", s.diasSem == null ? "" : s.diasSem, s.streak, s.fraco ? s.fraco.title : ""]));
     saveFile("verifica-fqa-resumo-" + ctSlug(t.nome) + "-" + fileStamp() + ".csv", csvText(rows));
   }
-  function exportTentativas(){
+  function exportTentativas(soAluno){
     const P = conta.prof, t = P.turmas.find(x => x.id === P.turmaId); if(!t) return;
     const nome = {}; P.alunos.forEach(a => { nome[a.id] = a.alcunha; });
     const rows = [["Aluno", "Turma", "Exercício", "Tópico", "Tipo", "Resposta", "Certa", "Viu resolução", "Data"]];
     P.rows.forEach(r => {
+      if(soAluno && r.aluno_id !== soAluno) return;
       const tp = TOPIC_OF.get(r.exercicio_id);
       rows.push([nome[r.aluno_id] || "", t.nome, r.exercicio_id, tp ? tp.title : "", r.tipo, r.resposta || "", r.certa === true ? "sim" : (r.certa === false ? "não" : ""), r.viu_resolucao ? "sim" : "não", ctFmtData(Date.parse(r.em))]);
     });
-    saveFile("verifica-fqa-tentativas-" + ctSlug(t.nome) + "-" + fileStamp() + ".csv", csvText(rows));
+    saveFile("verifica-fqa-tentativas-" + ctSlug(t.nome) + (soAluno ? "-" + ctSlug(nome[soAluno] || "aluno") : "") + "-" + fileStamp() + ".csv", csvText(rows));
   }
   function randomPin(){
     const a = new Uint32Array(1); (window.crypto || window.msCrypto).getRandomValues(a);
@@ -6389,6 +6537,44 @@ const LAB_EXERCISES = [
     }catch(err){ P.err = mapErr(err); render(); }
   }
 
+
+  /* ---------- treinar o que errei (aluno) ---------- */
+  function errosList(){
+    return ALL_QUESTIONS.filter(q => { const r = progress.solved[q.id]; return r && r.status === "incorrect"; });
+  }
+  function contaErrosBtn(){
+    if(ui.view === "erros") return "";
+    const n = errosList().length;
+    return n ? `<button class="btn" data-action="conta-erros">🔁 Treinar o que errei (${n})</button>` : "";
+  }
+  function contaOpenErros(){
+    ui.mode = "topics"; ui.view = "erros";
+    ui.errosIds = errosList().map(q => q.id);
+    ui.openQ.clear();
+    render(); window.scrollTo({ top: 0 });
+  }
+  function contaRenderErros(){
+    const qs = (ui.errosIds || []).map(id => Q_BY_ID.get(id)).filter(Boolean);
+    const feitos = qs.filter(q => { const r = progress.solved[q.id]; return r && r.status === "correct"; }).length;
+    const pend = qs.length - feitos;
+    const grupos = new Map();
+    qs.forEach(q => { const t = TOPIC_OF.get(q.id); const k = t ? t.id : "_"; if(!grupos.has(k)) grupos.set(k, { t: t, qs: [] }); grupos.get(k).qs.push(q); });
+    let corpo;
+    if(!qs.length){
+      corpo = `<p class="ct-muted" style="margin-top:14px;">Não tens exercícios errados por rever. Continua a praticar: quando falhares algum, ele aparece aqui.</p>`;
+    } else {
+      const resumo = pend === 0
+        ? `<b>Corrigiste todos os exercícios desta lista!</b>`
+        : `<b>${pend}</b> por rever${feitos ? ` · <b>${feitos}</b> já corrigido${feitos === 1 ? "" : "s"} nesta sessão` : ""}`;
+      corpo = `<div class="ct-erros-sum"><span>${resumo}</span><button type="button" class="btn ghost" data-action="conta-erros-atualizar">↻ Atualizar lista</button></div>` +
+        Array.from(grupos.values()).map(g => `<h3 class="ct-eh">${g.t ? ctEsc(g.t.title) : "Outros"} <span class="ct-count">${g.qs.length}</span></h3>
+          <div class="q-list">${g.qs.map((q, i) => renderHomeExerciseCard(q, i + 1)).join("")}</div>`).join("");
+    }
+    app.innerHTML = `<div class="topic-header"><div>
+        <h2>🔁 Treinar o que errei</h2>
+        <p>Os exercícios em que a tua última resposta foi errada. Resolve-os outra vez: os que acertares ficam com ✓.</p></div></div>${corpo}`;
+  }
+
   /* ---------- eventos (separados dos da app) ---------- */
   document.addEventListener("click", function(e){
     const el = e.target.closest("[data-action]");
@@ -6414,6 +6600,11 @@ const LAB_EXERCISES = [
     else if(a === "conta-apagar") profApagar(el.dataset.id);
     else if(a === "conta-csv-resumo") exportResumo();
     else if(a === "conta-csv-tentativas") exportTentativas();
+    else if(a === "conta-csv-aluno") exportTentativas(el.dataset.id);
+    else if(a === "conta-aluno"){ conta.prof.sel = el.dataset.id; conta.prof.pinMsg = ""; conta.prof.confirm = null; render(); window.scrollTo({ top: 0 }); }
+    else if(a === "conta-aluno-fechar"){ conta.prof.sel = null; render(); window.scrollTo({ top: 0 }); }
+    else if(a === "conta-erros") contaOpenErros();
+    else if(a === "conta-erros-atualizar") contaOpenErros();
     else if(a === "conta-copiar-codigo"){
       const c = (document.getElementById("ct-code") || {}).textContent || "";
       try{ navigator.clipboard.writeText(c).then(() => { el.textContent = "Copiado!"; }); }catch(_){ el.textContent = c; }
@@ -6429,8 +6620,13 @@ const LAB_EXERCISES = [
     if(e.target && e.target.getAttribute && e.target.getAttribute("data-ct-form") === "nova"){ e.preventDefault(); profCriarTurma(); }
   });
   document.addEventListener("change", function(e){
+    if(e.target && e.target.id === "ct-inat-sel"){
+      const n = parseInt(e.target.value, 10);
+      if([3, 7, 14, 30].indexOf(n) >= 0){ conta.prof.inatDias = n; ctSaveLS("fqa_conta_inat_dias", String(n)); render(); }
+      return;
+    }
     if(e.target && e.target.id === "ct-turma-sel"){
-      conta.prof.turmaId = e.target.value; conta.prof.pinMsg = ""; conta.prof.msg = "";
+      conta.prof.turmaId = e.target.value; conta.prof.pinMsg = ""; conta.prof.msg = ""; conta.prof.sel = null;
       conta.prof.loading = true; render();
       profLoadData().catch(err => { conta.prof.err = mapErr(err); }).then(() => { conta.prof.loading = false; render(); });
     }
