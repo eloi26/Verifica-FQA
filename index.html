@@ -2003,100 +2003,45 @@
   const TOPIC_BY_ID = {};
   TOPICS.forEach(t=>{ TOPIC_BY_ID[t.id] = t; });
 
-  /* ================= EXAMES NACIONAIS (arquivo IAVE) ================= */
-  // Ligações diretas aos documentos oficiais do IAVE (Física e Química A, código 715).
-  // Fonte: https://iave.pt/provas-e-exames/arquivo/arquivo-provas-e-exames-finais-nacionais-es/
-  const U = "https://iave.pt/wp-content/uploads/";
-  function examDocs(v1, v2, cc){
-    const docs = [];
-    if(v1) docs.push({label:"Enunciado — Versão 1", url:U+v1, kind:"prova"});
-    if(v2) docs.push({label:"Enunciado — Versão 2", url:U+v2, kind:"prova"});
-    if(cc) docs.push({label:"Critérios de Classificação", url:U+cc, kind:"cc"});
-    return docs;
-  }
-  const EXAMS = [
-    { year:2025, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2025/06/EX-FQA715-F1-2025-V1_net.pdf","2025/06/EX-FQA715-F1-2025-V2_net.pdf","2025/07/EX-FQA715-F1-2025-CC-VD_net.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2025/07/EX-FQA715-F2-2025-V1_net.pdf","2025/07/EX-FQA715-F2-2025-V2_net.pdf","2025/07/EX-FQA715-F2-2025-CC-VD_net.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2025/08/EX-FQA715-EE-2025.pdf",null,"2025/08/EX-FQA715-EE-2025-CC.pdf")}
-    ]},
-    { year:2024, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2024/06/EX-FQA715-F1-2024-V1_net-3.pdf","2024/06/EX-FQA715-F1-2024-V2_net-1.pdf","2024/07/EX-FQA715-F1-2024-CC-VD_net.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2024/07/EX-FQA715-F2-2024-V1-1.pdf","2024/07/EX-FQA715-F2-2024-V2.pdf","2024/07/EX-FQA715-F2-2024-CC-VD_net.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2024/08/EX-FQA715-EE-2024_net.pdf",null,"2024/08/EX-FQA715-EE-2024-CC_net.pdf")}
-    ]},
-    { year:2023, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2023/06/EX-FQA715-F1-2023-V1_net.pdf","2023/06/EX-FQA715-F1-2023-V2_net.pdf","2023/07/EX-FQA715-F1-2023-CC-VD_net.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2023/07/EX-FQA715-F2-2023-V1_net.pdf","2023/07/EX-FQA715-F2-2023-V2_net.pdf","2023/07/EX-FQA715-F2-2023-CC-VD_net.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2023/08/EX-FQA715-EE-2023.pdf",null,"2023/08/EX-FQA715-EE-2023-CC.pdf")}
-    ]},
-    { year:2022, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2022/06/EX-FQA715-F1-2022-V1_net.pdf","2022/06/EX-FQA715-F1-2022-V2_net.pdf","2022/07/EX-FQA715-F1-2022-CC-VD_net.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2022/07/EX-FQA715-F2-2022-V1.pdf","2022/07/EX-FQA715-F2-2022-V2.pdf","2022/07/EX-FQA715-F2-2022-CC-VD_net.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2022/08/EX-FQA715-EE-2022_net.pdf",null,"2022/08/EX-FQA715-EE-2022-CC.pdf")}
-    ]},
-    { year:2021, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2021/07/EX-FQA715-F1-2021-V1_net.pdf","2021/07/EX-FQA715-F1-2021-V2_net.pdf","2021/07/EX-FQA715-F1-2021-CC-VD_net.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2021/09/EX-FQA715-F2-2021-V1_net.pdf","2021/09/EX-FQA715-F2-2021-V2_net.pdf","2021/09/EX-FQA715-F2-2021-CC-VD_net.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2021/10/EX-FQA715-EE-2021-V1_net.pdf","2021/10/EX-FQA715-EE-2021-V2_net.pdf","2021/10/EX-FQA715-EE-2021-CC_net.pdf")}
-    ]},
-    { year:2020, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/07/EX-FQA715-F1-2020-V1_net.pdf","2020/07/EX-FQA715-F1-2020-V2_net.pdf","2020/07/EX-FQA715-F1-2020-CC-VD_net.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2021/01/EX-FQA715-F2-2020-V1-1.pdf","2021/01/EX-FQA715-F2-2020-V2-1.pdf","2021/01/EX-FQA715-F2-2020-CC-VD_net.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2021/01/EX-FQA715-EE-2020_net.pdf",null,"2021/01/EX-FQA715-EE-2020-CC_net.pdf")}
-    ]},
-    { year:2019, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/02/EX-FQA715-F1-2019-V1_net.pdf","2020/02/EX-FQA715-F1-2019-V2_net.pdf","2020/02/EX-FQA715-F1-2019-CC-VD_net.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2020/02/EX-FQA715-F2-2019-V1_net.pdf","2020/03/EX-FQA715-F2-2019-V2.pdf","2020/02/EX-FQA715-F2-2019-CC-VD_net.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2021/06/EX-FQA715-EE-2019-1.pdf",null,"2021/06/EX-FQA715-EE-2019-CC-1.pdf")}
-    ]},
-    { year:2018, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/04/EX-FQA715-F1-2018-V1_net.pdf","2020/04/EX-FQA715-F1-2018-V2_net.pdf","2021/03/EX-FQA715-F1-2018-CC-VD-1.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2020/04/EX-FQA715-F2-2018-V1_net.pdf","2020/04/EX-FQA715-F2-2018-V2_net.pdf","2020/04/EX-FQA715-F2-2018-CC-VD_net.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2025/06/EX-FQA715-EE-2018.pdf",null,"2021/07/EX-FQA715-EE-2018-CC.pdf")}
-    ]},
-    { year:2017, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/04/EX-FQA715-F1-2017-V1.pdf","2020/04/EX-FQA715-F1-2017-V2.pdf","2020/04/EX-FQA715-F1-2017-CC-VD.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2020/04/EX-FQA715-F2-2017-V1.pdf","2020/04/EX-FQA715-F2-2017-V2.pdf","2020/05/EX-FQA715-F2-2017-CC-VD.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2020/04/EX-FQA715-EE-2017-V1.pdf","2020/04/EX-FQA715-EE-2017-V2.pdf","2020/04/EX-FQA715-EE-2017-CC.pdf")}
-    ]},
-    { year:2016, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/04/EX-FQA715-F1-2016-V1-net.pdf","2020/04/EX-FQA715-F1-2016-V2-net.pdf","2020/04/EX-FQA715-F1-2016-CC-VD.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2020/04/EX-FQA715-F2-2016-V1-net.pdf","2020/04/EX-FQA715-F2-2016-V2-net.pdf","2020/04/EX-FQA715-F2-2016-CC-VD.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2020/04/EX-FQA715-EE-2016-net.pdf",null,"2020/04/EX-FQA715-EE-2016-CC.pdf")}
-    ]},
-    { year:2015, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/04/EX-FQA715-F1-2015-V1.pdf","2020/04/EX-FQA715-F1-2015-V2.pdf","2020/04/EX-FQA715-F1-2015-CC.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2020/04/EX-FQA715-F2-2015-V1.pdf","2020/04/EX-FQA715-F2-2015-V2.pdf","2020/04/EX-FQA715-F2-2015-CC.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2020/04/EX-FQA715-EE-2015.pdf",null,"2020/04/EX-FQA715-EE-2015-CC.pdf")}
-    ]},
-    { year:2014, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/04/EX-FQA715-F1-2014-V1.pdf","2020/04/EX-FQA715-F1-2014-V2.pdf","2020/04/EX-FQA715-F1-2014-CC.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2020/04/EX-FQA715-F2-2014-V1.pdf","2020/04/EX-FQA715-F2-2014-V2.pdf","2020/04/EX-FQA715-F2-2014-CC.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2020/04/EX_FQA715_EE_2014.pdf",null,"2020/04/EX_FQA715_EE_2014_CC.pdf")}
-    ]},
-    { year:2013, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/04/EX_FQA715_F1_2013_V1.pdf","2020/04/EX_FQA715_F1_2013_V2.pdf","2020/04/EX_FQA715_F1_2013_CC.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2020/04/EX_FQA715_F2_2013_V1.pdf","2020/04/EX_FQA715_F2_2013_V2.pdf","2020/04/EX_FQA715_F2_2013_CC.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2020/04/EX_FQA715_EE_2013.pdf",null,"2020/04/EX_FQA715_EE_2013_CC.pdf")}
-    ]},
-    { year:2012, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/04/EX-FQA715-F1-2012-V1.pdf","2020/03/FQ-A715-P1-2012-V2-1.pdf","2020/04/EX-FQA715-F1-2012-CC.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2020/04/EX-FQA715-F2-2012-V1.pdf","2020/04/FQ-A715-P2-2012-V2.pdf","2020/04/EX-FQA715-F2-2012-CC.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2020/04/EX-FQA715-EE-2012.pdf",null,"2020/04/EX-FQA715-EE-2012-CC.pdf")}
-    ]},
-    { year:2011, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/03/FIS-QUIM-A715_P1_V1_2011.pdf","2020/03/FIS-QUIM-A715_P1_V2_2011.pdf","2020/03/FIS-QUIM-A715_CC1_2011.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2020/04/FIS-QUIM-A715_P2_V1_2011.pdf","2020/04/FIS-QUIM-A715_P2_V2_2011.pdf","2020/04/FIS-QUIM-A715_CC2_2011.pdf")},
-      {key:"ee", label:"Época Especial", docs:examDocs("2020/04/FIS-QUIM-A715-EE-2011.pdf",null,"2020/04/FIS-QUIM-A715-EE-CC-2011.pdf")}
-    ]},
-    { year:2010, phases:[
-      {key:"f1", label:"1.ª Fase", docs:examDocs("2020/04/fisica_quimicaA715_pef1_10-3.pdf","2020/04/FQA715_2010_fase1_v2.pdf","2020/04/fisica_quimicaA715_ccf1_10-3.pdf")},
-      {key:"f2", label:"2.ª Fase", docs:examDocs("2020/04/fisica_quimicaA715_pef2_10-1.pdf",null,"2020/04/fisica_quimicaA715_ccf2_10-3.pdf")}
-      // Sem Época Especial arquivada para este ano/disciplina.
-    ]}
+  /* ================= EXAMES NACIONAIS (PDFs alojados na pasta exames/) ================= */
+  // Exames Nacionais de Física e Química A (prova 715), 2012–2026. Os PDFs ficam na pasta "exames/" ao lado
+  // do index.html, com o nome  <ano>-<fase>-<tipo>.pdf  (fase: f1 | f2 | ee ; tipo: v1 | v2 | cc).
+  // Para acrescentar um exame basta juntar o nome (sem .pdf) à lista EXAM_FILES.
+  const EXAM_FILES = [
+    "2026-f1-v1","2026-f1-cc","2026-f2-v1","2026-f2-cc","2026-ee-v1","2026-ee-cc",
+    "2025-f1-v1","2025-f1-cc","2025-f2-v1","2025-f2-cc","2025-ee-v1","2025-ee-cc",
+    "2024-f1-v1","2024-f1-cc","2024-f2-v1","2024-f2-cc","2024-ee-v1","2024-ee-cc",
+    "2023-f1-v1","2023-f1-cc","2023-f2-v1","2023-f2-cc","2023-ee-v1","2023-ee-cc",
+    "2022-f1-v1","2022-f1-cc","2022-f2-v1","2022-f2-cc","2022-ee-v1","2022-ee-cc",
+    "2021-f1-v1","2021-f1-cc","2021-f2-v1","2021-f2-cc","2021-ee-v1","2021-ee-cc",
+    "2020-f1-v1","2020-f1-cc","2020-f2-v1","2020-f2-cc","2020-ee-v1","2020-ee-cc",
+    "2019-f1-v1","2019-f1-cc","2019-f2-v1","2019-f2-cc","2019-ee-v1","2019-ee-cc",
+    "2018-f1-v1","2018-f1-cc","2018-f2-v1","2018-f2-cc","2018-ee-v1","2018-ee-cc",
+    "2017-f1-v1","2017-f1-cc","2017-f2-v1","2017-f2-cc","2017-ee-v1","2017-ee-cc",
+    "2016-f1-v1","2016-f1-cc","2016-f2-v1","2016-f2-cc","2016-ee-v1","2016-ee-cc",
+    "2015-f1-v1","2015-f1-cc","2015-f2-v1","2015-f2-cc","2015-ee-v1","2015-ee-cc",
+    "2014-f1-v1","2014-f1-cc","2014-f2-v1","2014-f2-cc","2014-ee-v1","2014-ee-cc",
+    "2013-f1-v1","2013-f1-cc","2013-f2-v1","2013-f2-cc","2013-ee-v1","2013-ee-cc",
+    "2012-f1-v1","2012-f1-cc","2012-f2-v1","2012-f2-cc","2012-ee-v1","2012-ee-cc"
   ];
-  const EXAM_ARCHIVE_URL = "https://iave.pt/provas-e-exames/arquivo/arquivo-provas-e-exames-finais-nacionais-es/";
+  const EXAM_PHASE_LABEL = {f1:"1.ª Fase", f2:"2.ª Fase", ee:"Época Especial"};
+  const EXAMS = (function(){
+    const byYear = {};
+    EXAM_FILES.forEach(name=>{
+      const [yr, ph, tp] = name.split("-");
+      ((byYear[yr] = byYear[yr] || {})[ph] = byYear[yr][ph] || {})[tp] = "Exames/"+name+".pdf";
+    });
+    return Object.keys(byYear).sort((a,b)=>b-a).map(yr=>({
+      year: +yr,
+      phases: ["f1","f2","ee"].filter(k=>byYear[yr][k]).map(k=>{
+        const f = byYear[yr][k], docs = [];
+        if(f.v1) docs.push({label: f.v2 ? "Enunciado — Versão 1" : "Enunciado", url:f.v1, kind:"prova"});
+        if(f.v2) docs.push({label:"Enunciado — Versão 2", url:f.v2, kind:"prova"});
+        if(f.cc) docs.push({label:"Critérios de Classificação", url:f.cc, kind:"cc"});
+        return {key:k, label:EXAM_PHASE_LABEL[k], docs};
+      })
+    }));
+  })();
 
   // Calendário sugerido de estudo para quem começa a preparação em outubro, definido pelo professor —
   // mostrado no separador Plano, acima do plano de estudos por domínio/tema. Editável conforme o calendário da turma.
@@ -4918,10 +4863,8 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
 
     app.innerHTML = `
       <div class="exams-intro">
-        <p>Enunciados e critérios de classificação oficiais dos Exames Nacionais de Física e Química A (código 715),
-        publicados pelo <a href="${EXAM_ARCHIVE_URL}" target="_blank" rel="noopener">IAVE</a> — arquivo desde 2010,
-        organizado por ano e fase (1.ª Fase, 2.ª Fase e Época Especial). Alguns documentos mais antigos podem,
-        ocasionalmente, ter sido reorganizados no site do IAVE; se um link não abrir, o arquivo oficial acima tem sempre a versão mais atual.</p>
+        <p>Enunciados e critérios de classificação dos Exames Nacionais de Física e Química A (prova 715),
+        organizados por ano e fase (1.ª Fase, 2.ª Fase e Época Especial). Os documentos abrem em PDF.</p>
       </div>
       <div class="exam-year-list">${yearsHtml}</div>
     `;
