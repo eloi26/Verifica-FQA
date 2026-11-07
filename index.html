@@ -319,6 +319,7 @@
   .exams-intro{ margin:16px 0 20px; }
   .exams-intro p{ color:var(--ink-soft); font-size:0.88rem; line-height:1.55; max-width:70ch; margin:0; }
   .exams-intro a{ color:var(--physics); font-weight:600; }
+  .exams-intro p + p{ margin-top:10px; }
   .exam-year-list{ display:flex; flex-direction:column; gap:14px; }
   .exam-year-card{
     border:1px solid var(--line); background:var(--paper-raised); border-radius:16px;
@@ -336,6 +337,13 @@
     font-family:var(--font-body); text-transform:uppercase; letter-spacing:0.03em;
   }
   .exam-done-toggle.done{ background:var(--good-soft); border-color:var(--good); color:var(--good); }
+  .exam-fora{ margin:0 0 10px; padding:8px 10px; border-radius:9px; background:var(--chemistry-soft); color:var(--ink); font-size:0.82rem; line-height:1.45; }
+  .exam-score{ display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; margin-top:12px; font-size:0.85rem; }
+  .exam-score label{ font-weight:600; color:var(--ink-soft); }
+  .exam-score-box{ display:inline-flex; align-items:center; gap:6px; color:var(--ink-soft); }
+  .exam-score input{ width:5.2em; padding:6px 8px; border:1px solid var(--line); border-radius:8px; background:var(--paper-raised); color:var(--ink); font:inherit; font-variant-numeric:tabular-nums; text-align:right; }
+  .exam-score input:focus-visible{ outline:2px solid var(--physics); outline-offset:1px; }
+  .exam-score-pct{ color:var(--ink-faint); font-size:0.78rem; min-height:1em; }
   .doc-links{ display:flex; gap:8px; flex-wrap:wrap; }
   .doc-link{
     font-size:0.8rem; font-weight:600; text-decoration:none; border-radius:9px; padding:7px 11px;
@@ -2007,6 +2015,20 @@
   // Exames Nacionais de Física e Química A (prova 715), 2012–2026. Os PDFs ficam na pasta "exames/" ao lado
   // do index.html, com o nome  <ano>-<fase>-<tipo>.pdf  (fase: f1 | f2 | ee ; tipo: v1 | v2 | cc).
   // Para acrescentar um exame basta juntar o nome (sem .pdf) à lista EXAM_FILES.
+  // Itens de exames antigos que já não fazem parte do programa (não são para resolver). Chave: <ano>-<fase>.
+  const EXAM_FORA = {
+    "2012-f1":["Grupo V – 3"],
+    "2012-f2":["Grupo I","Grupo II – 2","Grupo IV – 4.2","Grupo VI – 1"],
+    "2013-f1":["Grupo II – 2"],
+    "2013-f2":["Grupo I – 4","Grupo V – 2"],
+    "2014-f1":["Grupo II – 2","Grupo V – 1.2"],
+    "2015-f1":["Grupo I – 4","Grupo III – 3","Grupo IV – 1.2"],
+    "2015-f2":["Grupo II – 3.2","Grupo V – 2"],
+    "2016-f1":["Grupo IV – 3","Grupo VII – 3"],
+    "2016-f2":["Grupo V – 2"],
+    "2017-f2":["Grupo II – 3.2"]
+  };
+  const EXAM_MAX_PTS = 200;
   const EXAM_FILES = [
     "2026-f1-v1","2026-f1-cc","2026-f2-v1","2026-f2-cc","2026-ee-v1","2026-ee-cc",
     "2025-f1-v1","2025-f1-cc","2025-f2-v1","2025-f2-cc","2025-ee-v1","2025-ee-cc",
@@ -4129,9 +4151,35 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
     try{ safeSet(EXAM_STORE_KEY, JSON.stringify(p)); }catch(e){ /* ignore */ }
   }
   let examProgress = loadExamProgress();
+  // Classificação (em pontos, 0–200) que o aluno atribui a si próprio depois de autocorrigir o exame.
+  let EXAM_SCORE_KEY = "fqa_treino_exames_nota_v1";
+  function loadExamScores(){
+    try{ return JSON.parse(localStorage.getItem(EXAM_SCORE_KEY)) || {}; }catch(e){ return {}; }
+  }
+  function saveExamScores(p){
+    try{ safeSet(EXAM_SCORE_KEY, JSON.stringify(p)); }catch(e){ /* ignore */ }
+  }
+  let examScores = loadExamScores();
+  function parseExamScore(raw){
+    const t = String(raw == null ? "" : raw).trim().replace(",", ".");
+    if(t === "") return null;
+    const n = Math.round(Number(t));
+    if(!isFinite(n)) return undefined;
+    return Math.max(0, Math.min(EXAM_MAX_PTS, n));
+  }
+  function setExamScore(key, raw){
+    const v = parseExamScore(raw);
+    if(v === undefined) return null;
+    if((v === null && examScores[key] == null) || examScores[key] === v) return v;   // sem alteração: nada a gravar nem a enviar
+    if(v === null) delete examScores[key]; else examScores[key] = v;
+    saveExamScores(examScores);
+    if(typeof contaLogNota === "function") contaLogNota(key, v);
+    return v;
+  }
   function toggleExamDone(key){
     examProgress[key] = !examProgress[key];
     saveExamProgress(examProgress);
+    contaLogExam(key, !!examProgress[key]);
     render();
   }
   function examStats(){
@@ -4376,6 +4424,7 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
       activity: progress.activity || [],
       activityCounts: progress.activityCounts || {},
       examProgress: examProgress || {},
+      examScores: examScores || {},
       planWatched: (planProgress && planProgress.watched) || {}
     };
   }
@@ -4415,6 +4464,10 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
       if(obj.examProgress[k]) examProgress[k] = true;
     });
     saveExamProgress(examProgress);
+    Object.keys(obj.examScores||{}).forEach(function(k){
+      if(examScores[k] == null && typeof obj.examScores[k] === "number") examScores[k] = obj.examScores[k];
+    });
+    saveExamScores(examScores);
 
     if(!planProgress.watched) planProgress.watched = {};
     Object.keys(obj.planWatched||{}).forEach(function(k){
@@ -4842,6 +4895,13 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
       const phasesHtml = y.phases.map(p=>{
         const key = y.year+"-"+p.key;
         const isDone = !!examProgress[key];
+        const fora = EXAM_FORA[key] || [];
+        const nota = examScores[key];
+        const notaHtml = `<div class="exam-score">
+            <label for="nota-${key}">A minha classificação</label>
+            <span class="exam-score-box"><input type="number" id="nota-${key}" data-exam-nota="${key}" min="0" max="${EXAM_MAX_PTS}" step="1" inputmode="numeric" placeholder="—" value="${nota==null?"":nota}"> / ${EXAM_MAX_PTS} pontos</span>
+            <span class="exam-score-pct" id="nota-pct-${key}" aria-live="polite">${nota==null?"":Math.round(100*nota/EXAM_MAX_PTS)+"%"}</span>
+          </div>`;
         const docsHtml = p.docs.map(d=>
           `<a class="doc-link ${d.kind}" href="${d.url}" target="_blank" rel="noopener">${d.label} ↗</a>`
         ).join("");
@@ -4852,7 +4912,9 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
               ${isDone ? "✓ Resolvido" : "Marcar como resolvido"}
             </button>
           </div>
+          ${fora.length ? `<p class="exam-fora"><b>⚠ Não resolver</b> (já não faz parte do programa): ${fora.join(" · ")}</p>` : ""}
           <div class="doc-links">${docsHtml}</div>
+          ${notaHtml}
         </div>`;
       }).join("");
       return `<section class="exam-year-card">
@@ -4865,6 +4927,10 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
       <div class="exams-intro">
         <p>Enunciados e critérios de classificação dos Exames Nacionais de Física e Química A (prova 715),
         organizados por ano e fase (1.ª Fase, 2.ª Fase e Época Especial). Os documentos abrem em PDF.</p>
+        <p><b>Atenção:</b> alguns exercícios dos exames de 2012 a 2017 já não fazem parte do programa, pelo que <b>não são para resolver</b>.
+        Estão indicados em cada exame afetado.</p>
+        <p><b>A minha classificação:</b> depois de corrigires o exame, regista os pontos que obtiveste (de 0 a ${EXAM_MAX_PTS}).
+        Se voltares a resolver o exame, altera o valor sempre que quiseres. O professor vê a classificação mais recente.</p>
       </div>
       <div class="exam-year-list">${yearsHtml}</div>
     `;
@@ -5653,6 +5719,15 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
   });
 
   document.addEventListener("change", function(e){
+    if(e.target && e.target.dataset && e.target.dataset.examNota){
+      const key = e.target.dataset.examNota;
+      const v = setExamScore(key, e.target.value);
+      const pct = document.getElementById("nota-pct-"+key);
+      if(v === null && String(e.target.value).trim() !== ""){ e.target.value = examScores[key] == null ? "" : examScores[key]; return; }
+      e.target.value = v == null ? "" : v;
+      if(pct) pct.textContent = v == null ? "" : Math.round(100*v/EXAM_MAX_PTS)+"% · guardado";
+      return;
+    }
     if(e.target && e.target.id==="transfer-file-input"){
       const f = e.target.files && e.target.files[0];
       if(f) importarFicheiro(f);
@@ -5682,7 +5757,7 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
   const CONTA_SEM_KEY = "fqa_sem_conta";
   const QUEUE_KEY = "fqa_conta_fila_v1";
   const PERFIL_CACHE = "fqa_conta_perfil_v1_";
-  const BASE_KEYS = { progress: STORE_KEY, exam: EXAM_STORE_KEY, plan: PLAN_STORE_KEY };
+  const BASE_KEYS = { progress: STORE_KEY, exam: EXAM_STORE_KEY, plan: PLAN_STORE_KEY, nota: EXAM_SCORE_KEY };
   const Q_BY_ID = new Map(ALL_QUESTIONS.map(q => [q.id, q]));
   const TOPIC_OF = new Map();
   TOPICS.forEach(t => t.questions.forEach(q => TOPIC_OF.set(q.id, t)));
@@ -5743,18 +5818,88 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
   function switchStorage(uid){
     STORE_KEY = BASE_KEYS.progress + (uid ? "_" + uid : "");
     EXAM_STORE_KEY = BASE_KEYS.exam + (uid ? "_" + uid : "");
+    EXAM_SCORE_KEY = BASE_KEYS.nota + (uid ? "_" + uid : "");
     PLAN_STORE_KEY = BASE_KEYS.plan + (uid ? "_" + uid : "");
     progress = loadProgress();
     examProgress = loadExamProgress();
+    examScores = loadExamScores();
     planProgress = loadPlanProgress();
     ui.chosen = {}; ui.draft = {}; ui.continuing = {}; ui.openShown = {};
     ui.openQ.clear();
   }
 
   /* ---------- reconstruir o progresso a partir das tentativas ---------- */
+  /* Exames resolvidos: guardados na mesma tabela «tentativas», com exercicio_id "ex-<ano>-<fase>"
+     (ex.: ex-2019-f1) e resposta "_exame" (resolvido) ou "_exame_off" (desmarcado). Não contam como exercícios. */
+  function isExamRow(r){ return !!(r && typeof r.resposta === "string" && r.resposta.indexOf("_exame") === 0); }
+  const exKey = r => String(r.exercicio_id).replace(/^ex-/, "");
+  function rebuildExams(rows){
+    const m = {};
+    rows.forEach(r => {
+      if(!isExamRow(r)) return;
+      if(r.resposta === "_exame") m[exKey(r)] = true;
+      else if(r.resposta === "_exame_off") delete m[exKey(r)];
+    });
+    return m;
+  }
+  // Classificações: resposta "_exame_nota:<pontos>" (vazio = apagada). Devolve { chave: { nota, hist:[…anteriores], em } }
+  function parseNotaRow(r){
+    const m = /^_exame_nota:(\d{0,3})$/.exec(r.resposta || ""); if(!m) return undefined;
+    return m[1] === "" ? null : Math.min(EXAM_MAX_PTS, parseInt(m[1], 10));
+  }
+  function rebuildScores(rows){
+    const out = {};
+    rows.forEach(r => {
+      const v = parseNotaRow(r); if(v === undefined) return;
+      const k = exKey(r), o = out[k] || (out[k] = { nota: null, hist: [], em: 0 });
+      if(o.nota != null) o.hist.push(o.nota);
+      o.nota = v; o.em = Date.parse(r.em) || 0;
+    });
+    Object.keys(out).forEach(k => { if(out[k].nota == null) delete out[k]; });
+    return out;
+  }
+  function contaLogNota(key, v){
+    ctLogRow({ exercicio_id: "ex-" + key, tipo: "open", resposta: "_exame_nota:" + (v == null ? "" : v), certa: null, viu_resolucao: false });
+  }
+  function examKeysValid(){
+    const ok = new Set();
+    EXAMS.forEach(y => y.phases.forEach(p => ok.add(y.year + "-" + p.key)));
+    return ok;
+  }
+  function contaLogExam(key, done){
+    ctLogRow({ exercicio_id: "ex-" + key, tipo: "open", resposta: done ? "_exame" : "_exame_off", certa: null, viu_resolucao: false });
+  }
+  // Atualiza os exames resolvidos a partir do servidor (+ o que ainda está na fila por enviar)
+  // e envia as marcas que só existiam neste dispositivo (feitas antes desta versão).
+  function syncExamsFrom(rows){
+    const mine = qMine();
+    const all = rows.concat(mine);            // servidor + ainda por enviar (por ordem)
+    const merged = rebuildExams(all), scores = rebuildScores(all);
+    const valid = examKeysValid();
+    const feito = new Set(), comNota = new Set();
+    all.forEach(r => {
+      if(r.resposta === "_exame" || r.resposta === "_exame_off") feito.add(exKey(r));
+      else if(parseNotaRow(r) !== undefined) comNota.add(exKey(r));
+    });
+    const novo = (k, resposta) => { conta.queue.push({ aluno_id: conta.user.id, em: new Date().toISOString(), exercicio_id: "ex-" + k, tipo: "open", resposta: resposta, certa: null, viu_resolucao: false }); };
+    // marcas/notas antigas, só neste dispositivo, que o servidor nunca viu: envia-as
+    Object.keys(examProgress || {}).forEach(k => {
+      if(examProgress[k] && valid.has(k) && !feito.has(k)){ merged[k] = true; novo(k, "_exame"); }
+    });
+    const nota = {};
+    Object.keys(scores).forEach(k => { nota[k] = scores[k].nota; });
+    Object.keys(examScores || {}).forEach(k => {
+      const v = examScores[k];
+      if(typeof v === "number" && valid.has(k) && !comNota.has(k)){ nota[k] = Math.max(0, Math.min(EXAM_MAX_PTS, Math.round(v))); novo(k, "_exame_nota:" + nota[k]); }
+    });
+    qSave();
+    examProgress = merged; saveExamProgress(examProgress);
+    examScores = nota; saveExamScores(examScores);
+  }
   function rebuild(rows){
     const solved = {}, days = [], seen = new Set(), counts = {};
     rows.forEach(r => {
+      if(isExamRow(r)) return;
       const id = r.exercicio_id;
       if(r.resposta === "_retry"){ delete solved[id]; return; }
       const rec = solved[id] || (solved[id] = { status: null, attempts: 0, revealed: false });
@@ -5891,13 +6036,15 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
             .select("id,exercicio_id,resposta,certa,viu_resolucao,em").eq("aluno_id", user.id)
             .order("em", { ascending: true }).order("id", { ascending: true }).range(a, b)));
           progress = rebuild(rows); saveProgress(progress);
-          conta.offerImport = (rows.length === 0 && !ctLoadLS("fqa_import_" + user.id)) ? importCandidates().length : 0;
+          syncExamsFrom(rows);
+          conta.offerImport = (rows.filter(r => !isExamRow(r)).length === 0 && !ctLoadLS("fqa_import_" + user.id)) ? importCandidates().length : 0;
         }catch(e){ /* sem ligação: mantém o progresso local */ }
       }
     }
     conta.state = "in"; conta.err = ""; conta.busy = false;
     if(ui.mode === "turma" && perfil.papel !== "professor") ui.mode = "topics";
     render();
+    if(perfil.papel === "aluno" && qMine().length) flushQueue();
   }
   function importCandidates(){
     let base = null;
@@ -5920,6 +6067,7 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
         .select("id,exercicio_id,resposta,certa,viu_resolucao,em").eq("aluno_id", conta.user.id)
         .order("em", { ascending: true }).order("id", { ascending: true }).range(a, b)));
       progress = rebuild(rows); saveProgress(progress);
+      syncExamsFrom(rows);
     }catch(e){}
     render();
   }
@@ -6181,6 +6329,9 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
     const lista = P.alunos.map(a => {
       const rows = by[a.id];
       const rb = rebuild(rows);
+      const nEx = Object.keys(rebuildExams(rows)).length;
+      const vN = Object.values(rebuildScores(rows)).map(o => o.nota);
+      const notaMedia = vN.length ? Math.round(vN.reduce((a, b) => a + b, 0) / vN.length) : null;
       let certos = 0, tentados = 0, nT = 0, nC = 0, ultimo = 0;
       Object.keys(rb.solved).forEach(k => { tentados++; if(rb.solved[k].status === "correct") certos++; });
       const topicos = {};
@@ -6202,7 +6353,7 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
         const pct = o.c / o.n;
         if(!fraco || pct < fraco.pct || (pct === fraco.pct && o.n > fraco.n)) fraco = { pct: pct, n: o.n, title: o.t.title };
       });
-      return { id: a.id, alcunha: a.alcunha, certos: certos, tentados: tentados, nT: nT, nC: nC,
+      return { id: a.id, alcunha: a.alcunha, exames: nEx, notaMedia: notaMedia, certos: certos, tentados: tentados, nT: nT, nC: nC,
                pct: nT ? Math.round(100 * nC / nT) : null, ultimo: ultimo, streak: streakOf(rb.activity), fraco: fraco,
                diasSem: ultimo ? ctDiasDesde(ultimo) : null };
     });
@@ -6233,6 +6384,9 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
     const al = P.alunos.find(a => a.id === id); if(!al) return null;
     const rows = P.rows.filter(r => r.aluno_id === id);
     const rb = rebuild(rows);
+    const exFeitos = rebuildExams(rows), exNotas = rebuildScores(rows);
+    const exData = {};
+    rows.forEach(r => { if(r.resposta === "_exame") exData[exKey(r)] = Date.parse(r.em); });
     const topicos = {}, porEx = {}, dias = {};
     let nT = 0, nC = 0, ultimo = 0;
     rows.forEach(r => {
@@ -6276,7 +6430,12 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
       const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - i);
       serie.push({ d: d, n: dias[d.toDateString()] || 0 });
     }
-    return { al: al, nT: nT, nC: nC, certos: certos, tentados: tentados, ultimo: ultimo, streak: streakOf(rb.activity),
+    const exames = [];
+    EXAMS.forEach(y => y.phases.forEach(p => {
+      const k = y.year + "-" + p.key, n = exNotas[k];
+      if(exFeitos[k] || n) exames.push({ ano: y.year, fase: p.label, feito: !!exFeitos[k], em: exData[k] || (n ? n.em : 0), nota: n ? n.nota : null, hist: n ? n.hist : [], emNota: n ? n.em : 0 });
+    }));
+    return { al: al, exames: exames, nT: nT, nC: nC, certos: certos, tentados: tentados, ultimo: ultimo, streak: streakOf(rb.activity),
              pct: nT ? Math.round(100 * nC / nT) : null, temas: temas, erros: erros, serie: serie, total14: serie.reduce((a, b) => a + b.n, 0) };
   }
   function contaRenderAluno(P, turma, errH, msgH){
@@ -6287,6 +6446,8 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
         <div class="ct-kpi"><div class="n">${D.pct == null ? "—" : D.pct + "%"}</div><div class="l">Tentativas certas</div></div>
         <div class="ct-kpi"><div class="n">${D.ultimo ? ctHa(ctDiasDesde(D.ultimo)) : "—"}</div><div class="l">Último acesso</div></div>
         <div class="ct-kpi"><div class="n">${D.streak}</div><div class="l">Dias seguidos</div></div>
+        <div class="ct-kpi"><div class="n">${D.exames.length}/${examStats().total}</div><div class="l">Exames resolvidos</div></div>
+        <div class="ct-kpi"><div class="n">${(() => { const ns = D.exames.filter(x => x.nota != null); return ns.length ? Math.round(ns.reduce((a, x) => a + x.nota, 0) / ns.length) + "/" + EXAM_MAX_PTS : "—"; })()}</div><div class="l">Nota média nos exames</div></div>
       </div>`;
     const max = Math.max(1, ...D.serie.map(x => x.n));
     const wd = ["D", "S", "T", "Q", "Q", "S", "S"], p2 = n => String(n).padStart(2, "0");
@@ -6313,6 +6474,12 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
         return `<li><div class="ct-fa-t">${ctEsc(txt)}${ctTxt(q).length > 110 ? "…" : ""}</div>
           <div class="ct-fa-m">${t ? ctEsc(t.title) + " · " : ""}<span class="ct-mono">${ctEsc(x.id)}</span> · errou <b>${x.e}</b> em ${x.n} · ${x.ainda ? "<b>ainda por acertar</b>" : "já acertou depois"}</div></li>`;
       }).join("")}</ol>` : `<p class="ct-muted">Ainda não errou nenhum exercício.</p>`;
+    const examesH = D.exames.length
+      ? `<ul class="ct-inat">${D.exames.map(x => `<li><b>${x.ano}</b> · ${ctEsc(x.fase)}
+          ${x.nota != null ? ` — <b>${x.nota}/${EXAM_MAX_PTS}</b> pontos (${Math.round(100 * x.nota / EXAM_MAX_PTS)}%)` : ""}
+          <span class="ct-muted">${x.feito ? "resolvido" : "sem marcar como resolvido"}${x.em ? " · " + ctFmtData(x.em).slice(0, 10) : ""}${x.hist.length ? " · classificações anteriores: " + x.hist.join(", ") : ""}</span></li>`).join("")}</ul>
+         <p class="ct-small">Marcados e classificados pelo próprio aluno na app (autocorreção). A classificação mostrada é a mais recente.</p>`
+      : `<p class="ct-muted">Ainda não marcou nenhum exame como resolvido.</p>`;
     return `<div class="ct-panel">
         <div class="ct-head"><div class="ct-row"><button type="button" class="btn ghost" data-action="conta-aluno-fechar">← Voltar à turma</button></div>
           <div class="ct-row"><button type="button" class="btn ghost" data-action="conta-recarregar" ${P.loading ? "disabled" : ""}>${P.loading ? "A atualizar…" : "↻ Atualizar"}</button>
@@ -6322,6 +6489,7 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
         ${errH}${msgH}${kpi}
         <h2 class="ct-h2">Atividade nos últimos 14 dias</h2>${atividade}
         <h2 class="ct-h2">Evolução por tema</h2>${temas}
+        <h2 class="ct-h2">Exames nacionais resolvidos <span class="ct-count">${D.exames.length}</span></h2>${examesH}
         <h2 class="ct-h2">Exercícios com mais erros</h2>${erros}</div>`;
   }
   function contaRenderTurma(){
@@ -6360,7 +6528,7 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
         return `<tr>
           <td class="ct-nm"><button type="button" class="ct-link" data-action="conta-aluno" data-id="${ctEsc(s.id)}" title="Ver o detalhe deste aluno">${ctEsc(s.alcunha)}</button></td>
           <td class="num">${s.certos}</td><td class="num">${s.tentados}</td>
-          <td class="num">${s.pct == null ? "—" : s.pct + "%"}</td><td class="num">${s.nT}</td>
+          <td class="num">${s.pct == null ? "—" : s.pct + "%"}</td><td class="num">${s.nT}</td><td class="num">${s.exames}</td><td class="num">${s.notaMedia == null ? "—" : s.notaMedia}</td>
           <td>${ctFmtData(s.ultimo)}</td><td class="num">${s.streak}</td>
           <td>${s.fraco ? ctEsc(s.fraco.title) + " <span class=\"ct-muted\">(" + Math.round(s.fraco.pct * 100) + "%)</span>" : "—"}</td>
           <td class="ct-acts">
@@ -6369,9 +6537,9 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
           </td></tr>`;
       }).join("");
       const tabela = C.lista.length ? `<div class="ct-tablewrap"><table class="ct-table">
-          <thead><tr><th>Aluno</th><th class="num">Certos</th><th class="num">Tentados</th><th class="num">% certas</th><th class="num">Tentativas</th><th>Último acesso</th><th class="num">Dias seg.</th><th>Tema mais fraco</th><th></th></tr></thead>
+          <thead><tr><th>Aluno</th><th class="num">Certos</th><th class="num">Tentados</th><th class="num">% certas</th><th class="num">Tentativas</th><th class="num" title="Sessões de exame marcadas como resolvidas pelo aluno">Exames</th><th class="num" title="Média das classificações (em 200 pontos) que o aluno registou nos exames">Nota média</th><th>Último acesso</th><th class="num">Dias seg.</th><th>Tema mais fraco</th><th></th></tr></thead>
           <tbody>${linhas}</tbody></table></div>
-          <p class="ct-small">Clica no nome de um aluno para ver o detalhe. «Certos» e «Tentados» contam exercícios distintos; «% certas» conta tentativas.</p>`
+          <p class="ct-small">Clica no nome de um aluno para ver o detalhe. «Certos» e «Tentados» contam exercícios distintos; «% certas» conta tentativas; «Exames» são as sessões de exame que o aluno marcou como resolvidas (em ${examStats().total}); «Nota média» é a média das classificações (0–${EXAM_MAX_PTS}) que registou nos exames.</p>`
         : `<p class="ct-muted">Ainda não há alunos nesta turma. Dá-lhes o código <b class="ct-mono">${ctEsc(turma.codigo)}</b> para criarem conta.</p>`;
       const inativosH = function(C){
         const lim = P.inatDias;
@@ -6398,6 +6566,7 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
         <h2 class="ct-h2">Onde a turma mais falha</h2>${falh}
         <h2 class="ct-h2">Exportar para Excel</h2>
         <div class="ct-row"><button type="button" class="btn" data-action="conta-csv-resumo">Resumo da turma (.csv)</button>
+          <button type="button" class="btn" data-action="conta-csv-exames">Exames e classificações (.csv)</button>
           <button type="button" class="btn" data-action="conta-csv-tentativas">Todas as tentativas (.csv)</button></div>
         <p class="ct-small">O plano gratuito do Supabase não faz cópias de segurança automáticas: exporta os dados regularmente. Os ficheiros abrem diretamente no Excel.</p>`;
     }
@@ -6434,9 +6603,24 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
   function exportResumo(){
     const P = conta.prof, t = P.turmas.find(x => x.id === P.turmaId); if(!t) return;
     const C = profCompute();
-    const rows = [["Aluno", "Turma", "Exercícios certos", "Exercícios tentados", "Tentativas", "Tentativas certas", "% certas", "Último acesso", "Dias sem atividade", "Dias seguidos", "Tema mais fraco"]];
-    C.lista.forEach(s => rows.push([s.alcunha, t.nome, s.certos, s.tentados, s.nT, s.nC, s.pct == null ? "" : s.pct, s.ultimo ? ctFmtData(s.ultimo) : "", s.diasSem == null ? "" : s.diasSem, s.streak, s.fraco ? s.fraco.title : ""]));
+    const rows = [["Aluno", "Turma", "Exercícios certos", "Exercícios tentados", "Tentativas", "Tentativas certas", "% certas", "Exames resolvidos", "Nota média nos exames (/200)", "Último acesso", "Dias sem atividade", "Dias seguidos", "Tema mais fraco"]];
+    C.lista.forEach(s => rows.push([s.alcunha, t.nome, s.certos, s.tentados, s.nT, s.nC, s.pct == null ? "" : s.pct, s.exames, s.notaMedia == null ? "" : s.notaMedia, s.ultimo ? ctFmtData(s.ultimo) : "", s.diasSem == null ? "" : s.diasSem, s.streak, s.fraco ? s.fraco.title : ""]));
     saveFile("verifica-fqa-resumo-" + ctSlug(t.nome) + "-" + fileStamp() + ".csv", csvText(rows));
+  }
+  function exportExames(){
+    const P = conta.prof, t = P.turmas.find(x => x.id === P.turmaId); if(!t) return;
+    const rows = [["Aluno", "Turma", "Ano", "Fase", "Resolvido", "Classificação (/" + EXAM_MAX_PTS + ")", "%", "Classificações anteriores", "Data"]];
+    P.alunos.forEach(a => {
+      const rs = P.rows.filter(r => r.aluno_id === a.id);
+      const feitos = rebuildExams(rs), notas = rebuildScores(rs), datas = {};
+      rs.forEach(r => { if(r.resposta === "_exame") datas[exKey(r)] = Date.parse(r.em); });
+      EXAMS.slice().sort((x, y) => x.year - y.year).forEach(y => y.phases.forEach(p => {
+        const k = y.year + "-" + p.key, n = notas[k];
+        if(!feitos[k] && !n) return;
+        rows.push([a.alcunha, t.nome, y.year, p.label, feitos[k] ? "sim" : "não", n ? n.nota : "", n ? Math.round(100 * n.nota / EXAM_MAX_PTS) : "", n ? n.hist.join(", ") : "", ctFmtData(n ? n.em : (datas[k] || 0))]);
+      }));
+    });
+    saveFile("verifica-fqa-exames-" + ctSlug(t.nome) + "-" + fileStamp() + ".csv", csvText(rows));
   }
   function exportTentativas(soAluno){
     const P = conta.prof, t = P.turmas.find(x => x.id === P.turmaId); if(!t) return;
@@ -6556,6 +6740,7 @@ LAB_EXERCISES.push(...[{"id":43,"subject":"fisica","titulo":"Queda de uma esfera
     else if(a === "conta-apagar") profApagar(el.dataset.id);
     else if(a === "conta-csv-resumo") exportResumo();
     else if(a === "conta-csv-tentativas") exportTentativas();
+    else if(a === "conta-csv-exames") exportExames();
     else if(a === "conta-csv-aluno") exportTentativas(el.dataset.id);
     else if(a === "conta-aluno"){ conta.prof.sel = el.dataset.id; conta.prof.pinMsg = ""; conta.prof.confirm = null; render(); window.scrollTo({ top: 0 }); }
     else if(a === "conta-aluno-fechar"){ conta.prof.sel = null; render(); window.scrollTo({ top: 0 }); }
