@@ -571,6 +571,112 @@
     .plan-tema-body{ padding-left:10px; }
     .plan-tema-empty{ margin-left:10px; }
   }
+
+  /* ===== LAYOUT A: cores vivas, cartões por tópico, menu inferior no telemóvel ===== */
+  :root{
+    --chem-vivid:#FF7A1A; --chem-deep:#9A3A00;
+    --on-physics:#FFFFFF; --on-chem:#131C27;
+    --yellow:#FFD23F; --on-yellow:#131C27;
+    --hero-track:rgba(255,255,255,0.28); --hero-soft:#E4EBFF;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --chem-vivid:#FF9A3D; --chem-deep:#F2A15C;
+      --on-physics:#0A0E15; --hero-track:rgba(10,14,21,0.25); --hero-soft:#0F1B3D;
+    }
+  }
+  :root[data-theme="dark"]{
+    --chem-vivid:#FF9A3D; --chem-deep:#F2A15C;
+    --on-physics:#0A0E15; --hero-track:rgba(10,14,21,0.25); --hero-soft:#0F1B3D;
+  }
+  .mode-tabs{ gap:4px; padding:4px; border-radius:16px; }
+  .mode-tab{ display:flex; align-items:center; justify-content:center; gap:8px; min-height:44px; border-radius:12px; font-size:0.86rem; padding:0 12px; white-space:nowrap; }
+  .mode-tab svg{ flex:none; }
+  .chip{ min-height:44px; padding:0 16px; font-size:0.88rem; }
+  .chip.phys[aria-pressed="true"]{ color:var(--on-physics); }
+  .chip.chem[aria-pressed="true"]{ background:var(--chem-vivid); border-color:var(--chem-vivid); color:var(--on-chem); }
+
+  /* Cabeçalho de boas-vindas */
+  .hero-home{ display:flex; flex-wrap:wrap; gap:14px; margin:18px 0 6px; }
+  .hh-goal{
+    flex:999 1 420px; min-width:0; display:flex; flex-wrap:wrap; align-items:center; gap:18px 22px;
+    padding:22px; border-radius:26px; background:var(--physics); color:var(--on-physics);
+  }
+  .hh-ring{ position:relative; flex:none; width:96px; height:96px; display:flex; align-items:center; justify-content:center; }
+  .hh-ring svg{ position:absolute; inset:0; }
+  .hh-ring .num{ position:relative; font-family:var(--font-display); font-weight:800; font-size:1.7rem; }
+  .hh-ring .num small{ font-size:0.95rem; font-weight:600; opacity:0.85; }
+  .hh-text{ flex:1 1 220px; display:flex; flex-direction:column; gap:10px; min-width:0; }
+  .hh-text h1{ margin:0; font-size:1.9rem; line-height:1.1; font-weight:800; }
+  .hh-text p{ margin:0; font-size:0.95rem; line-height:1.45; opacity:0.92; }
+  .hh-cta{
+    align-self:flex-start; min-height:50px; padding:0 22px; border:none; border-radius:14px; cursor:pointer;
+    background:var(--yellow); color:var(--on-yellow); font:700 1rem var(--font-body); text-align:left;
+  }
+  .hh-cta:focus-visible{ outline:3px solid var(--on-physics); outline-offset:2px; }
+  .hh-stats{ flex:1 1 230px; min-width:0; display:grid; grid-template-columns:1fr; gap:10px; }
+  .hh-stat{ display:flex; flex-direction:row; align-items:baseline; gap:10px; padding:12px 18px; border-radius:20px; background:var(--paper-raised); border:1px solid var(--line); }
+  .hh-stat .num{ font-family:var(--font-display); font-weight:800; font-size:1.7rem; line-height:1.05; }
+  .hh-stat .lbl{ font-size:0.8rem; font-weight:600; color:var(--ink-soft); }
+  .hh-stat.streak{ background:var(--yellow); border-color:var(--yellow); color:var(--on-yellow); }
+  .hh-stat.streak .lbl{ color:var(--on-yellow); }
+
+  /* Blocos por domínio e cartões dos tópicos */
+  .domain-block{ margin-top:34px; }
+  .domain-heading{ border-left:none; padding-left:0; font-size:1.25rem; display:flex; flex-direction:column; gap:2px; }
+  .domain-heading::before{ content:""; display:block; width:34px; height:6px; border-radius:999px; background:var(--domain-color,var(--ink-faint)); margin-bottom:8px; }
+  .topic-grid{ grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; margin-top:16px; }
+  .topic-card{ padding:0; gap:0; border-radius:22px; overflow:hidden; box-shadow:none; transition:transform .12s ease, box-shadow .15s ease; }
+  .topic-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-md); }
+  .topic-card:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+  .tc-top{ display:flex; align-items:flex-start; justify-content:space-between; padding:18px 18px 16px; }
+  .tc-top.fisica{ background:var(--physics-soft); }
+  .tc-top.quimica{ background:var(--chemistry-soft); }
+  .tc-ico{ display:flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:16px; }
+  .tc-top.fisica .tc-ico{ background:var(--physics); color:var(--on-physics); }
+  .tc-top.quimica .tc-ico{ background:var(--chem-vivid); color:var(--on-chem); }
+  .tc-year{ padding:4px 11px; border-radius:999px; background:var(--paper-raised); font-size:0.78rem; font-weight:700; }
+  .tc-top.fisica .tc-year{ color:var(--physics-ink); }
+  .tc-top.quimica .tc-year{ color:var(--chem-deep); }
+  .tc-body{ display:flex; flex-direction:column; gap:12px; padding:16px 18px 18px; flex:1; }
+  .tc-body h3{ font-size:1.15rem; line-height:1.2; min-height:2.4em; margin:0; }
+  .tc-body p{ font-size:0.82rem; color:var(--ink-soft); margin:0; line-height:1.4; }
+  .tc-prog{ display:flex; flex-direction:column; gap:7px; margin-top:auto; }
+  .tc-meta{ display:flex; justify-content:space-between; gap:8px; font-size:0.8rem; color:var(--ink-soft); }
+  .tc-meta b{ font-weight:700; }
+  .tc-cta{ display:flex; align-items:center; justify-content:center; min-height:44px; border-radius:12px; font-weight:700; font-size:0.92rem; }
+  .topic-card.fisica .tc-cta{ background:var(--physics); color:var(--on-physics); }
+  .topic-card.quimica .tc-cta{ background:var(--chem-vivid); color:var(--on-chem); }
+
+  /* Telemóvel: menu fixo em baixo, cartões em lista */
+  @media (max-width:700px){
+    body{ padding-bottom:calc(84px + env(safe-area-inset-bottom,0px)); }
+    .mode-tabs{
+      position:fixed; left:0; right:0; bottom:0; z-index:40; margin:0; gap:2px;
+      border-radius:0; border-width:1px 0 0; padding:6px 4px calc(8px + env(safe-area-inset-bottom,0px));
+      overflow:visible; background:var(--paper-raised); box-shadow:0 -4px 16px rgba(19,28,39,0.08);
+    }
+    .mode-tab{ flex:1 1 0; min-width:0; flex-direction:column; gap:3px; min-height:54px; padding:4px 0; font-size:0.66rem; border-radius:12px; }
+    .mode-tab[aria-selected="true"]{ background:var(--physics-soft); color:var(--physics-ink); }
+    .hh-text h1{ font-size:1.6rem; }
+    .hh-stats{ grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    .hh-stat{ flex-direction:column; align-items:flex-start; gap:2px; padding:12px; border-radius:16px; }
+    .hh-stat .num{ font-size:1.4rem; }
+    .hh-stat .lbl{ font-size:0.72rem; line-height:1.25; }
+    .app-purpose{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .topic-grid{ grid-template-columns:1fr; gap:12px; }
+    .topic-card{ flex-direction:row; align-items:stretch; border-radius:20px; }
+    .tc-top{ flex-direction:column; justify-content:center; align-items:center; gap:8px; padding:14px 12px; flex:none; width:92px; }
+    .tc-year{ font-size:0.7rem; padding:3px 8px; }
+    .tc-ico{ width:52px; height:52px; }
+    .tc-body{ padding:14px 14px 14px; gap:8px; min-width:0; }
+    .tc-body h3{ font-size:1rem; min-height:0; }
+    .tc-body p{ display:none; }
+    .tc-cta{ min-height:40px; }
+  }
+  @media (max-width:480px){
+    .mode-tab{ font-size:0.62rem; padding:4px 0; }
+  }
   /* ---------- contas ---------- */
   body.auth-mode header.top, body.auth-mode .app-purpose, body.auth-mode #storageNotice, body.auth-mode footer{ display:none; }
   body.mode-turma .app-purpose, body.mode-turma #statsRow, body.mode-turma #quickActions{ display:none; }
@@ -4536,15 +4642,27 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
   const modeTabsEl = document.getElementById("modeTabs");
   const quickActionsEl = document.getElementById("quickActions");
 
+  const TAB_ICO = {
+    calendario:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    topics:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+    progress:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+    exams:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>',
+    plano:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>',
+    lab:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/><path d="M7.5 15h9"/>',
+    turma:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M17 14c2.6 0 4.4 1.8 4.4 4.6"/>'
+  };
+  function tabIco(k){
+    return `<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${TAB_ICO[k]}</svg>`;
+  }
   function renderModeTabs(){
     modeTabsEl.innerHTML = `
-      <button class="mode-tab" data-action="mode-calendario" aria-selected="${ui.mode==='calendario'}">📅 Calendário de preparação de Exame</button>
-      <button class="mode-tab" data-action="mode-topics" aria-selected="${ui.mode==='topics'}">📘 Tópicos</button>
-      <button class="mode-tab" data-action="mode-progress" aria-selected="${ui.mode==='progress'}">📊 Progresso</button>
-      <button class="mode-tab" data-action="mode-exams" aria-selected="${ui.mode==='exams'}">🗂️ Exames</button>
-      <button class="mode-tab" data-action="mode-plano" aria-selected="${ui.mode==='plano'}">🎥 Plano</button>
-      <button class="mode-tab" data-action="mode-lab" aria-selected="${ui.mode==='lab'}">🧪 Lab</button>
-      ${contaIsProf() ? `<button class="mode-tab" data-action="mode-turma" aria-selected="${ui.mode==='turma'}">👩‍🏫 Turma</button>` : ""}
+      <button class="mode-tab" data-action="mode-calendario" aria-label="Calendário de preparação de Exame" aria-selected="${ui.mode==='calendario'}">${tabIco('calendario')}<span>Calendário</span></button>
+      <button class="mode-tab" data-action="mode-topics" aria-selected="${ui.mode==='topics'}">${tabIco('topics')}<span>Tópicos</span></button>
+      <button class="mode-tab" data-action="mode-progress" aria-selected="${ui.mode==='progress'}">${tabIco('progress')}<span>Progresso</span></button>
+      <button class="mode-tab" data-action="mode-exams" aria-selected="${ui.mode==='exams'}">${tabIco('exams')}<span>Exames</span></button>
+      <button class="mode-tab" data-action="mode-plano" aria-selected="${ui.mode==='plano'}">${tabIco('plano')}<span>Plano</span></button>
+      <button class="mode-tab" data-action="mode-lab" aria-selected="${ui.mode==='lab'}">${tabIco('lab')}<span>Lab</span></button>
+      ${contaIsProf() ? `<button class="mode-tab" data-action="mode-turma" aria-selected="${ui.mode==='turma'}">${tabIco('turma')}<span>Turma</span></button>` : ""}
     `;
   }
 
@@ -4571,6 +4689,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
   }
 
   function renderStats(){
+    if(ui.mode==="topics" && ui.view==="home"){ statsRow.innerHTML = ""; return; }
     const s = overallStats();
     const streak = computeStreak();
     const acc = s.attempted>0 ? Math.round((s.correct/s.attempted)*100) : 0;
@@ -4597,6 +4716,71 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       <circle cx="20" cy="20" r="${r}" fill="none" stroke="${color}" stroke-width="4"
         stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round"/>
     </svg>`;
+  }
+
+  const ICO_TOPIC = {
+    curva:'<path d="M3 18c4.5 0 4.5-12 9-12s4.5 12 9 12"/><circle cx="12" cy="6" r="1.6"/>',
+    raio:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+    sol:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+    atomo:'<circle cx="12" cy="12" r="1.8"/><ellipse cx="12" cy="12" rx="9.5" ry="4"/><ellipse cx="12" cy="12" rx="9.5" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9.5" ry="4" transform="rotate(120 12 12)"/>',
+    balao:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/><path d="M7.5 15h9"/>',
+    tabela:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16M15 10v10"/>',
+    onda:'<path d="M2 12c2.5-6 4.5-6 7 0s4.5 6 7 0 3.5-4 6-3"/>'
+  };
+  function topicIconKey(t){
+    const n = (t.title||"").toLowerCase();
+    if(/tabela/.test(n)) return "tabela";
+    if(/átomos|eletrões|espectros/.test(n)) return "atomo";
+    if(/ondas|sinais/.test(n)) return "onda";
+    if(/elétric|eletromag|circuito/.test(n)) return "raio";
+    if(/térmic|radia/.test(n)) return "sol";
+    return t.subject==="fisica" ? "curva" : "balao";
+  }
+  function topicIcon(t){
+    return `<svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICO_TOPIC[topicIconKey(t)]}</svg>`;
+  }
+  const LAST_TOPIC_KEY = "fqa_ultimo_topico_v1";
+  const DAILY_GOAL = 10;
+  function getLastTopic(){ try{ return localStorage.getItem(LAST_TOPIC_KEY) || ""; }catch(e){ return ""; } }
+  function setLastTopic(id){ try{ safeSet(LAST_TOPIC_KEY, id); }catch(e){ /* ignore */ } }
+  function goalRingSvg(pct){
+    const size=96, stroke=11, r=(size-stroke)/2, c=2*Math.PI*r;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--hero-track)" stroke-width="${stroke}"/>
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--yellow)" stroke-width="${stroke}" stroke-linecap="round"
+        stroke-dasharray="${(c*pct).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 ${size/2} ${size/2})"/>
+    </svg>`;
+  }
+  function renderHeroHome(){
+    const today = new Date().toDateString();
+    const done = (progress.activityCounts && progress.activityCounts[today]) || 0;
+    const pct = Math.min(1, done/DAILY_GOAL);
+    const left = Math.max(0, DAILY_GOAL-done);
+    const nick = (typeof contaNick==="function") ? contaNick() : "";
+    const hello = nick ? `Olá, ${escapeHtml(nick)}` : "Olá!";
+    const msg = left===0 ? "Meta de hoje cumprida. Bom trabalho!"
+      : `Faltam ${left} ${left===1?"exercício":"exercícios"} para a meta de hoje.`;
+    const s = overallStats();
+    const streak = computeStreak();
+    const acc = s.attempted>0 ? Math.round((s.correct/s.attempted)*100) : 0;
+    const last = TOPIC_BY_ID[getLastTopic()];
+    const target = last || TOPICS[0];
+    const ctaLabel = (last ? "Continuar: " : "Começar: ") + target.title;
+    return `<section class="hero-home" aria-label="O teu dia">
+      <div class="hh-goal">
+        <div class="hh-ring" role="img" aria-label="${done} de ${DAILY_GOAL} exercícios feitos hoje">${goalRingSvg(pct)}<span class="num">${Math.min(done,DAILY_GOAL)}<small>/${DAILY_GOAL}</small></span></div>
+        <div class="hh-text">
+          <h1>${hello}</h1>
+          <p>${msg}</p>
+          <button class="hh-cta" data-action="open-topic" data-topic="${target.id}">${escapeHtml(ctaLabel)}</button>
+        </div>
+      </div>
+      <div class="hh-stats">
+        <div class="hh-stat streak"><span class="num">${streak}</span><span class="lbl">${streak===1?"dia seguido":"dias seguidos"}</span></div>
+        <div class="hh-stat"><span class="num">${s.correct}<small style="font-size:0.9rem;font-weight:600;color:var(--ink-soft)">/${s.total}</small></span><span class="lbl">exercícios resolvidos</span></div>
+        <div class="hh-stat"><span class="num">${acc}%</span><span class="lbl">% de sucesso</span></div>
+      </div>
+    </section>`;
   }
 
   function renderHome(){
@@ -4634,24 +4818,24 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
 
     const sections = groups.map(g=>{
       const dom = DOMAINS[g.domainId];
-      const domColor = dom.subject==="fisica" ? "var(--physics)" : "var(--chemistry)";
+      const domColor = dom.subject==="fisica" ? "var(--physics)" : "var(--chem-vivid)";
       const cards = g.topics.map(t=>{
         const st = topicStats(t);
         const pct = st.total>0 ? st.correct/st.total : 0;
-        const color = t.subject==="fisica" ? "var(--physics)" : "var(--chemistry)";
+        const color = t.subject==="fisica" ? "var(--physics)" : "var(--chem-vivid)";
+        const cta = (st.total>0 && st.correct===st.total) ? "Rever" : (st.attempted>0 ? "Continuar" : "Começar");
         return `
-        <button class="topic-card" data-action="open-topic" data-topic="${t.id}">
-          <div class="top-row">
-            <div>
-              <span class="subject-pill ${t.subject}">${subjectLabel(t.subject)} · ${t.ano}º ano</span>
-              <h3>${t.title}</h3>
-            </div>
-            <div class="ring">${ringSvg(pct, color)}
-              <span class="ring-num">${st.correct}/${st.total}</span>
-            </div>
-          </div>
-          <p>${t.blurb}</p>
-          <div class="progress-line"><i style="width:${Math.round(pct*100)}%;background:${color};"></i></div>
+        <button class="topic-card ${t.subject}" data-action="open-topic" data-topic="${t.id}">
+          <span class="tc-top ${t.subject}"><span class="tc-ico">${topicIcon(t)}</span><span class="tc-year">${t.ano}º ano</span></span>
+          <span class="tc-body">
+            <h3>${t.title}</h3>
+            <p>${t.blurb}</p>
+            <span class="tc-prog">
+              <span class="progress-line"><i style="width:${Math.round(pct*100)}%;background:${color};"></i></span>
+              <span class="tc-meta"><span>${st.correct} de ${st.total} resolvidos</span><b>${Math.round(pct*100)}%</b></span>
+            </span>
+            <span class="tc-cta">${cta}</span>
+          </span>
         </button>`;
       }).join("");
       return `<section class="domain-block">
@@ -4679,7 +4863,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       mainContentHtml = sections || '<p style="color:var(--ink-soft)">Sem tópicos para este filtro.</p>';
     }
 
-    app.innerHTML = `
+    app.innerHTML = renderHeroHome() + `
       <div class="filters" role="group" aria-label="Filtrar por disciplina">
         <button class="chip phys" data-action="filter-subject" data-value="todas" aria-pressed="${ui.subjectFilter==='todas'}">Todas</button>
         <button class="chip phys" data-action="filter-subject" data-value="fisica" aria-pressed="${ui.subjectFilter==='fisica'}">Física</button>
@@ -5648,7 +5832,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     else if(action==="lab-filter-ano"){ ui.labAnoFilter = el.dataset.value; render(); }
     else if(action==="lab-filter-subject"){ ui.labSubjectFilter = el.dataset.value; render(); }
     else if(action==="home"){ ui.view="home"; render(); }
-    else if(action==="open-topic"){ ui.view = el.dataset.topic; ui.openQ.clear(); render(); window.scrollTo({top:0,behavior:"smooth"}); }
+    else if(action==="open-topic"){ ui.view = el.dataset.topic; setLastTopic(ui.view); ui.openQ.clear(); render(); window.scrollTo({top:0,behavior:"smooth"}); }
     else if(action==="filter-subject"){ ui.subjectFilter = el.dataset.value; render(); }
     else if(action==="filter-ano"){ ui.anoFilter = el.dataset.value; render(); }
     else if(action==="filter-difficulty"){ ui.difficultyFilter = el.dataset.value; render(); }
@@ -6265,6 +6449,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
   }
 
   /* ---------- painel do professor ---------- */
+  function contaNick(){ return (conta.state === "in" && conta.perfil && conta.perfil.alcunha) ? String(conta.perfil.alcunha) : ""; }
   function contaIsProf(){ return conta.state === "in" && conta.perfil && conta.perfil.papel === "professor"; }
   async function profLoadTurmas(keep){
     const P = conta.prof; P.loading = true; P.err = ""; render();
