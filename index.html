@@ -677,6 +677,63 @@
   @media (max-width:480px){
     .mode-tab{ font-size:0.62rem; padding:4px 0; }
   }
+
+  /* ===== LAYOUT A em todos os ecrãs ===== */
+  .mode-tab[aria-selected="true"]{ background:var(--physics); color:var(--on-physics); }
+  body .ct-card{ border-radius:26px; box-shadow:none; padding:24px 22px; }
+  body .ct-seg{ border-radius:16px; }
+  body .ct-seg button{ border-radius:12px; }
+  body .ct-seg button[aria-selected="true"]{ background:var(--physics); color:var(--on-physics); }
+  body .ct-field input, .ct-sel{ border-radius:14px; }
+  .btn.primary{ border-radius:14px; min-height:50px; font-weight:700; }
+  .chip[aria-pressed="true"]{ background:var(--physics); border-color:var(--physics); color:var(--on-physics); }
+  body[data-screen="inner"] .app-purpose, body[data-screen="inner"] #statsRow{ display:none; }
+
+  .page-hero{
+    display:flex; flex-wrap:wrap; align-items:center; gap:16px 20px; margin:18px 0 20px;
+    padding:20px 22px; border-radius:26px; background:var(--physics); color:var(--on-physics);
+  }
+  .ph-ico{ flex:none; width:56px; height:56px; border-radius:16px; background:var(--yellow); color:var(--on-yellow); display:flex; align-items:center; justify-content:center; }
+  .ph-ico svg{ width:28px; height:28px; }
+  .ph-text{ flex:1 1 240px; min-width:0; }
+  .ph-text h1{ margin:0 0 4px; font-size:1.6rem; line-height:1.1; font-weight:800; }
+  .ph-text p{ margin:0; font-size:0.92rem; line-height:1.45; opacity:0.92; max-width:60ch; }
+  .ph-metric{ flex:0 1 190px; min-width:150px; display:flex; flex-direction:column; gap:3px; padding:12px 16px; border-radius:18px; background:var(--paper-raised); color:var(--ink); }
+  .ph-num{ font-family:var(--font-display); font-weight:800; font-size:1.6rem; line-height:1.05; }
+  .ph-num small{ font-size:0.9rem; font-weight:600; color:var(--ink-soft); }
+  .ph-lbl{ font-size:0.8rem; font-weight:600; color:var(--ink-soft); }
+  .ph-bar{ height:6px; border-radius:999px; background:var(--line); overflow:hidden; margin-top:5px; }
+  .ph-bar i{ display:block; height:100%; border-radius:999px; background:var(--physics); }
+
+  .topic-hero{ display:flex; align-items:center; gap:16px 18px; margin:18px 0 8px; padding:20px 22px; border-radius:26px; }
+  .topic-hero.fisica{ background:var(--physics); color:var(--on-physics); }
+  .topic-hero.quimica{ background:var(--chem-vivid); color:var(--on-chem); }
+  .th-ico{ flex:none; width:64px; height:64px; border-radius:18px; background:var(--yellow); color:var(--on-yellow); display:flex; align-items:center; justify-content:center; }
+  .th-text{ min-width:0; display:flex; flex-direction:column; gap:4px; }
+  .th-pill{ align-self:flex-start; padding:3px 11px; border-radius:999px; background:var(--paper-raised); color:var(--ink); font-size:0.78rem; font-weight:700; }
+  .th-dom{ font-size:0.82rem; opacity:0.9; }
+  .th-text h2{ margin:0; font-size:1.55rem; line-height:1.15; font-weight:800; }
+  .th-text p{ margin:0; font-size:0.92rem; line-height:1.45; opacity:0.92; max-width:60ch; }
+  .hero-daily{ border-radius:22px; box-shadow:none; }
+
+  .exams-intro{ margin:0 0 18px; padding:14px 18px; border-radius:20px; background:var(--paper-raised); border:1px solid var(--line); }
+  .exam-year-card, .calendario-fase, .plan-domain-card, .lab-grupo{ border-radius:22px; box-shadow:none; padding:18px 20px; }
+  .stats-section{ margin-top:16px; padding:18px 20px; border:1px solid var(--line); border-radius:22px; background:var(--paper-raised); }
+  .stats-section:first-of-type{ margin-top:0; }
+  .exam-year-title{ width:76px; padding:8px 0; text-align:center; align-self:flex-start; border-radius:14px; background:var(--physics-soft); color:var(--physics-ink); font-family:var(--font-display); font-weight:800; font-size:1.25rem; }
+  .calendario-fase-period{ width:auto; min-width:96px; height:fit-content; text-align:center; padding:5px 10px; border-radius:999px; background:var(--physics-soft); color:var(--physics-ink); }
+  .plan-domain-title::before{ content:""; display:block; width:34px; height:6px; border-radius:999px; background:var(--physics); margin-bottom:8px; }
+  .plan-subject-block.quimica .plan-domain-title::before{ background:var(--chem-vivid); }
+  .plano-list{ gap:22px; }
+  @media (max-width:700px){
+    .page-hero, .topic-hero{ padding:18px; border-radius:22px; }
+    .ph-text h1{ font-size:1.4rem; }
+    .ph-metric{ flex:1 1 100%; }
+    .th-ico{ width:52px; height:52px; }
+    .th-text h2{ font-size:1.35rem; }
+    .calendario-fase{ flex-direction:column; gap:8px; }
+    .calendario-fase-period{ align-self:flex-start; }
+  }
   /* ---------- contas ---------- */
   body.auth-mode header.top, body.auth-mode .app-purpose, body.auth-mode #storageNotice, body.auth-mode footer{ display:none; }
   body.mode-turma .app-purpose, body.mode-turma #statsRow, body.mode-turma #quickActions{ display:none; }
@@ -4523,6 +4580,11 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     `;
   }
 
+  function pageHero(k, title, text, m){
+    const pct = (m && m.den) ? Math.round(100*m.num/m.den) : 0;
+    const met = m ? `<div class="ph-metric"><span class="ph-num">${m.num}${m.den!=null?`<small>/${m.den}</small>`:""}</span><span class="ph-lbl">${m.label}</span>${m.den?`<div class="ph-bar"><i style="width:${pct}%"></i></div>`:""}</div>` : "";
+    return `<section class="page-hero" aria-label="${title}"><span class="ph-ico">${tabIco(k)}</span><div class="ph-text"><h1>${title}</h1><p>${text}</p></div>${met}</section>`;
+  }
   function renderQuickActions(){
     if(ui.mode==="topics"){
       const isHome = ui.view === "home";
@@ -4533,13 +4595,11 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
         ${contaErrosBtn()}
         ${backBtn}`;
     } else if(ui.mode==="exams"){
-      const st = examStats();
-      quickActionsEl.innerHTML = `<div class="exams-note">${st.done}/${st.total} sessões de exame assinaladas como resolvidas.</div>`;
+      quickActionsEl.innerHTML = "";
     } else if(ui.mode==="plano"){
-      const st = planStats();
-      quickActionsEl.innerHTML = `<div class="exams-note">${st.watched}/${st.total} vídeos marcados como vistos.</div>`;
+      quickActionsEl.innerHTML = "";
     } else if(ui.mode==="lab"){
-      quickActionsEl.innerHTML = `<div class="exams-note">${AL_SUMMARIES.length} resumos de Atividades Laboratoriais · ${LAB_EXERCISES.length} grupos de exercícios da componente prática.</div>`;
+      quickActionsEl.innerHTML = "";
     } else {
       quickActionsEl.innerHTML = "";
     }
@@ -4913,14 +4973,15 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       : `<p style="color:var(--ink-soft);margin-top:14px;">Sem exercícios com este grau de dificuldade neste tópico.</p>`;
 
     app.innerHTML = `
-      <div class="topic-header">
-        <div>
-          <span class="subject-pill ${t.subject}">${subjectLabel(t.subject)} · ${t.ano}º ano</span>
-          <div class="domain-breadcrumb">Domínio: ${dom.name}</div>
+      <section class="topic-hero ${t.subject}">
+        <span class="th-ico">${topicIcon(t)}</span>
+        <div class="th-text">
+          <span class="th-pill">${subjectLabel(t.subject)} · ${t.ano}º ano</span>
+          <div class="th-dom">Domínio: ${dom.name}</div>
           <h2>${t.title}</h2>
           <p>${t.blurb}</p>
         </div>
-      </div>
+      </section>
 
       <div class="hero-daily ${t.subject}">
         <div class="hero-label">☀️ Exercício de hoje</div>
@@ -4968,10 +5029,9 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       </section>`;
     }).join("");
 
-    app.innerHTML = `
+    const exSt0 = examStats();
+    app.innerHTML = pageHero("exams","Exames Nacionais","Enunciados e critérios de classificação de Física e Química A (prova 715), por ano e fase. Os documentos abrem em PDF.",{num:exSt0.done,den:exSt0.total,label:"sessões resolvidas"}) + `
       <div class="exams-intro">
-        <p>Enunciados e critérios de classificação dos Exames Nacionais de Física e Química A (prova 715),
-        organizados por ano e fase (1.ª Fase, 2.ª Fase e Época Especial). Os documentos abrem em PDF.</p>
         <p><b>Atenção:</b> alguns exercícios dos exames de 2012 a 2017 já não fazem parte do programa, pelo que <b>não são para resolver</b>.
         Estão indicados em cada exame afetado.</p>
         <p><b>A minha classificação:</b> depois de corrigires o exame, regista os pontos que obtiveste (de 0 a ${EXAM_MAX_PTS}).
@@ -4996,10 +5056,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
         </div>
       </div>`;
     }).join("");
-    app.innerHTML = `
-      <div class="exams-intro">
-        <p>Calendário sugerido para os alunos de 11.º ano que vão realizar o Exame Nacional de Física e Química A.</p>
-      </div>
+    app.innerHTML = pageHero("calendario","Calendário de estudo","Sugestão para os alunos de 11.º ano que vão realizar o Exame Nacional de Física e Química A.",null) + `
       <div class="calendario-list">${fasesHtml}</div>
       <p class="calendario-nota">🎥 Os vídeos do plano de estudos (separador Plano) podem ser vistos em qualquer altura do ano — sempre que sentires necessidade de rever, consolidar ou até aprender pela primeira vez algum conteúdo.</p>
     `;
@@ -5041,7 +5098,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
         </section>`;
       }).join("");
 
-      return `<section class="plan-subject-block">
+      return `<section class="plan-subject-block ${sec.subject}">
         <div class="plan-subject-head">
           <span class="subject-pill ${sec.subject}">${subjectLabel(sec.subject)} · ${sec.ano}º ano</span>
           <span class="plan-subject-manual mono">${sec.manual}</span>
@@ -5050,12 +5107,8 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       </section>`;
     }).join("");
 
-    app.innerHTML = `
-      <div class="exams-intro">
-        <p>Plano de estudos com vídeos organizados por domínio e tema, com referência
-        às páginas do manual, para apoiar a preparação para o exame. Marca os vídeos já vistos para acompanhares
-        o teu progresso — fica também registado na secção Progresso.</p>
-      </div>
+    const plSt0 = planStats();
+    app.innerHTML = pageHero("plano","Plano de estudos","Vídeos por domínio e tema, com as páginas do manual. Marca os que já viste para acompanhares o teu progresso.",{num:plSt0.watched,den:plSt0.total,label:"vídeos vistos"}) + `
       <div class="filters" role="group" aria-label="Filtrar por ano">
         <button class="chip" data-action="plan-filter-ano" data-value="todos" aria-pressed="${ui.planAnoFilter==='todos'}">Todos os anos</button>
         <button class="chip" data-action="plan-filter-ano" data-value="10" aria-pressed="${ui.planAnoFilter==='10'}">10º ano</button>
@@ -5124,7 +5177,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
             <div class="al-item-body">${sectionsHtml}</div>
           </details>`;
         }).join("");
-        return `<section class="plan-subject-block">
+        return `<section class="plan-subject-block ${g.subject}">
           <div class="plan-subject-head">
             <span class="subject-pill ${g.subject}">${subjectLabel(g.subject)} · ${g.ano}º ano</span>
           </div>
@@ -5156,10 +5209,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       bodyHtml = `<div class="lab-grupo-list">${gruposHtml || '<p style="color:var(--ink-soft)">Sem resultados para este filtro.</p>'}</div>`;
     }
 
-    app.innerHTML = `
-      <div class="exams-intro">
-        <p>Resumos das Atividades Laboratoriais (AL) e exercícios da componente prática, organizados por ano e disciplina, para apoiar a preparação para a avaliação prática do exame.</p>
-      </div>
+    app.innerHTML = pageHero("lab","Laboratório","Resumos das Atividades Laboratoriais e exercícios da componente prática, para preparar a avaliação prática do exame.",{num:AL_SUMMARIES.length,label:"resumos de AL · "+LAB_EXERCISES.length+" grupos de exercícios"}) + `
       ${viewToggleHtml}
       ${anoFilterHtml}
       ${subjectFilterHtml}
@@ -5222,7 +5272,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       return barRow(`${dom.name} · ${dom.ano}º ano`, st.correct, st.total, color);
     }).join("");
 
-    app.innerHTML = `
+    app.innerHTML = pageHero("progress","O teu progresso","Exercícios, exames e vídeos num só sítio.",{num:overall.correct,den:overall.total,label:"exercícios resolvidos"}) + `
       <section class="stats-section">
         <h3 class="section-title">Atividade</h3>
         <div class="streak-summary">
@@ -5269,6 +5319,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
   function render(){
     if(contaGate()){ contaRenderGate(); return; }
     renderModeTabs();
+    document.body.dataset.screen = (ui.mode==="topics" && ui.view==="home") ? "home" : "inner";
     renderStats();
     renderQuickActions();
     renderStorageNotice();
@@ -6430,9 +6481,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
         Array.from(grupos.values()).map(g => `<h3 class="ct-eh">${g.t ? ctEsc(g.t.title) : "Outros"} <span class="ct-count">${g.qs.length}</span></h3>
           <div class="q-list">${g.qs.map((q, i) => renderHomeExerciseCard(q, i + 1)).join("")}</div>`).join("");
     }
-    app.innerHTML = `<div class="topic-header"><div>
-        <h2>🔁 Treinar o que errei</h2>
-        <p>Os exercícios em que a tua última resposta foi errada. Resolve-os outra vez: os que acertares ficam com ✓.</p></div></div>${corpo}`;
+    app.innerHTML = pageHero("progress", "Treinar o que errei", "Os exercícios em que a tua última resposta foi errada. Resolve-os outra vez: os que acertares ficam com ✓.", null) + corpo;
   }
 
   /* ---------- eventos (separados dos da app) ---------- */
