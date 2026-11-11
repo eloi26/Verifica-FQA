@@ -4550,26 +4550,13 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
 
   function renderQuickActions(){
     if(ui.mode==="topics"){
-      const subjTxt = ui.subjectFilter==="todas" ? "" : subjectLabel(ui.subjectFilter);
-      const anoTxt = ui.anoFilter==="todos" ? "" : ui.anoFilter+"º ano";
-      const diffTxt = ui.difficultyFilter==="todas" ? "" : DIFF_LABELS[ui.difficultyFilter];
-      const filterBits = [subjTxt, anoTxt, diffTxt].filter(Boolean);
-      const filterNote = filterBits.length
-        ? `<div class="exams-note">🎲 A Prática rápida está a escolher só entre: ${filterBits.join(" · ")}.</div>`
-        : "";
       const isHome = ui.view === "home";
       // Fora do ecrã inicial (dentro de um tópico), o botão serve para voltar atrás — não faz sentido
       // repeti-lo quando já se está na lista de tópicos, por isso só aparece quando isHome é falso.
       const backBtn = isHome ? "" : `<button class="btn ghost" data-action="home">← Voltar aos tópicos</button>`;
-      const helperNote = isHome
-        ? `<div class="exams-note">Escolhe um tópico abaixo para praticares de forma organizada, ou deixa a Prática Rápida escolher um exercício ao acaso por ti.</div>`
-        : "";
       quickActionsEl.innerHTML = `
-        <button class="btn primary" data-action="random">🎲 Prática rápida</button>
         ${contaErrosBtn()}
-        ${backBtn}
-        ${filterNote}
-        ${helperNote}`;
+        ${backBtn}`;
     } else if(ui.mode==="exams"){
       const st = examStats();
       quickActionsEl.innerHTML = `<div class="exams-note">${st.done}/${st.total} sessões de exame assinaladas como resolvidas.</div>`;
@@ -4703,7 +4690,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
         <button class="chip" data-action="filter-ano" data-value="10" aria-pressed="${ui.anoFilter==='10'}">10º ano</button>
         <button class="chip" data-action="filter-ano" data-value="11" aria-pressed="${ui.anoFilter==='11'}">11º ano</button>
       </div>
-      <div class="filters" role="group" aria-label="Filtrar por dificuldade (afeta também a Prática rápida)">
+      <div class="filters" role="group" aria-label="Filtrar por dificuldade">
         <button class="chip" data-action="filter-difficulty" data-value="todas" aria-pressed="${ui.difficultyFilter==='todas'}">Todas (${diffTotal})</button>
         <button class="chip" data-action="filter-difficulty" data-value="facil" aria-pressed="${ui.difficultyFilter==='facil'}"><span class="q-diff facil" style="display:inline-block;margin-right:6px;"></span>Fácil (${diffCounts.facil})</button>
         <button class="chip" data-action="filter-difficulty" data-value="moderado" aria-pressed="${ui.difficultyFilter==='moderado'}"><span class="q-diff moderado" style="display:inline-block;margin-right:6px;"></span>Moderado (${diffCounts.moderado})</button>
@@ -5412,34 +5399,6 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     render();
   }
 
-  function goRandom(){
-    const matchesFilter = q=>{
-      const t = TOPIC_BY_ID[q.topicId];
-      const subjOk = ui.subjectFilter==="todas" || t.subject===ui.subjectFilter;
-      const anoOk = ui.anoFilter==="todos" || String(t.ano)===ui.anoFilter;
-      const diffOk = ui.difficultyFilter==="todas" || q.difficulty===ui.difficultyFilter;
-      return subjOk && anoOk && diffOk;
-    };
-    const filtered = ALL_QUESTIONS.filter(matchesFilter);
-    const base = filtered.length ? filtered : ALL_QUESTIONS;
-    const pool = base.filter(q=>{
-      const rec = progress.solved[q.id];
-      if(!rec) return true;
-      if(rec.status==="correct") return false;
-      if(rec.status==="incorrect" && rec.revealed) return false; // desistiu e viu a resolução — já não pode voltar a tentar
-      return true;
-    });
-    const chosen = (pool.length? pool : base)[Math.floor(Math.random()*(pool.length||base.length))];
-    ui.view = chosen.topicId;
-    ui.openQ.clear();
-    ui.openQ.add(chosen.id);
-    render();
-    requestAnimationFrame(()=>{
-      const el = document.querySelector(`.q-card[data-qid="${chosen.id}"]`);
-      if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
-    });
-  }
-
   function gerarResumo(){
     const nomeInput = document.getElementById("nome-input");
     const turmaInput = document.getElementById("turma-aluno-input");
@@ -5710,7 +5669,6 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       render();
     }
     else if(action==="open-self"){ submitOpen(el.dataset.qid, el.dataset.ok==="1"); }
-    else if(action==="random"){ goRandom(); }
     else if(action==="gerar-resumo"){ gerarResumo(); }
     else if(action==="copy-resumo-codigo"){ copyResumoCodigo(); }
     else if(action==="gerar-transferencia"){ gerarTransferencia(); }
