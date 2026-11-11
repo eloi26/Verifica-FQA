@@ -777,7 +777,7 @@
       </div>
     </div>
   <div id="contaBar"></div>
-  <p class="app-purpose">Ferramenta de estudo para Física e Química A (10º e 11º anos) com exercícios organizados por temas, com Exames Nacionais, com um plano de estudo com vídeos, com resumos das Atividades Laboratoriais com exercícios e um calendário de preparação para o Exame Nacional, de forma a apoiar a tua preparação ao longo do ano. No separador Progresso é possível veres a tua evolução e ainda consegues enviar o teu progresso ao teu professor.</p>
+  <p class="app-purpose">Ferramenta de estudo para Física e Química A (10º e 11º anos) com exercícios organizados por temas, com Exames Nacionais, com um plano de estudo com vídeos, com resumos das Atividades Laboratoriais com exercícios e um calendário de preparação para o Exame Nacional, de forma a apoiar a tua preparação ao longo do ano. No separador Progresso é possível veres a tua evolução. O professor acompanha o progresso da turma através das contas.</p>
   <header class="top">
     <div class="mode-tabs" id="modeTabs"></div>
     <div class="stats-row" id="statsRow"></div>
@@ -4323,33 +4323,10 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
   }
   let planProgress = loadPlanProgress();
 
-  // Identificação do aluno (guardada só neste dispositivo) e registo local do professor,
-  // usados pelo mecanismo de "resumo por código" — ver secção RESUMO / TURMA mais abaixo.
-  const NOME_STORE_KEY = "fqa_treino_nome_v1";
-  function loadNome(){ try{ return localStorage.getItem(NOME_STORE_KEY) || ""; }catch(e){ return ""; } }
-  function saveNome(n){ try{ safeSet(NOME_STORE_KEY, n||""); }catch(e){ /* ignore */ } }
-  let studentName = loadNome();
-
-  const TURMA_ALUNO_STORE_KEY = "fqa_treino_turma_aluno_v1"; // turma do próprio aluno (ex.: "10ºA")
-  function loadTurmaAluno(){ try{ return localStorage.getItem(TURMA_ALUNO_STORE_KEY) || ""; }catch(e){ return ""; } }
-  function saveTurmaAluno(t){ try{ safeSet(TURMA_ALUNO_STORE_KEY, t||""); }catch(e){ /* ignore */ } }
-  let studentClass = loadTurmaAluno();
-
-  const TURMA_STORE_KEY = "fqa_treino_turma_v1";
-  function loadTurma(){ try{ return JSON.parse(localStorage.getItem(TURMA_STORE_KEY)) || []; }catch(e){ return []; } }
-  function saveTurma(t){ try{ safeSet(TURMA_STORE_KEY, JSON.stringify(t)); }catch(e){ /* ignore */ } }
-  let turma = loadTurma();
-
-  // PIN de acesso à "Área do professor" — dissuasor simples, não é segurança real
-  // (o código da página é sempre visível/inspecionável). Editável aqui:
-  const PROF_PIN = "professor";
-  const PROF_UNLOCK_KEY = "fqa_treino_prof_unlock_v1";
-  function loadProfUnlock(){ try{ return localStorage.getItem(PROF_UNLOCK_KEY)==="1"; }catch(e){ return false; } }
-  function saveProfUnlock(v){ try{ if(v) safeSet(PROF_UNLOCK_KEY,"1"); else localStorage.removeItem(PROF_UNLOCK_KEY); }catch(e){ /* ignore */ } }
-
   function toggleVideoWatched(url){
     planProgress.watched[url] = !planProgress.watched[url];
     savePlanProgress(planProgress);
+    contaLogVideo(url, !!planProgress.watched[url]);
     render();
   }
   function planStats(){
@@ -4490,117 +4467,12 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     }).join(""));
   }
   // Um nome válido tem de incluir pelo menos primeiro e último nome (duas palavras).
-  function nomeCompletoValido(n){
-    return String(n||"").trim().split(/\s+/).filter(Boolean).length >= 2;
-  }
-  function buildResumoData(){
-    const overall = overallStats();
-    const acc = overall.attempted>0 ? Math.round((overall.correct/overall.attempted)*100) : 0;
-    const exSt = examStats();
-    const plSt = planStats();
-    return {
-      v:2,
-      nome: (studentName||"").trim() || "(sem nome)",
-      turma: (studentClass||"").trim() || "(sem turma)",
-      data: new Date().toISOString().slice(0,10),
-      streak: computeStreak(),
-      melhor: computeBestStreak(),
-      resolvidos: overall.attempted,
-      total: overall.total,
-      corretos: overall.correct,
-      acerto: acc,
-      examesFeitos: exSt.done,
-      examesTotal: exSt.total,
-      videosVistos: plSt.watched,
-      videosTotal: plSt.total
-    };
-  }
-  function encodeResumo(data){
-    try{ return b64EncodeUnicode(JSON.stringify(data)); }catch(e){ return ""; }
-  }
-  function decodeResumo(code){
-    try{
-      const obj = JSON.parse(b64DecodeUnicode(String(code).trim()));
-      if(!obj || typeof obj!=="object" || !obj.nome) return null;
-      return obj;
-    }catch(e){ return null; }
-  }
-  function formatResumoText(d, code){
-    return "Resumo de progresso — Verifica FQA\n" +
-      "Aluno(a): " + d.nome + "\n" +
-      "Turma: " + (d.turma || "(sem turma)") + "\n" +
-      "Data: " + d.data + "\n" +
-      "Sequência atual: " + d.streak + " dia(s) · Melhor sequência: " + d.melhor + " dia(s)\n" +
-      "Exercícios: " + d.corretos + "/" + d.resolvidos + " corretos (de " + d.total + " disponíveis) · % de sucesso: " + d.acerto + "%\n" +
-      "Exames Nacionais: " + d.examesFeitos + "/" + d.examesTotal + " sessões marcadas como resolvidas\n" +
-      "Plano de vídeos: " + d.videosVistos + "/" + d.videosTotal + " vídeos vistos\n\n" +
-      "Código: " + code;
-  }
 
   /* ---- Código de transferência entre dispositivos (progresso completo) ---- */
-  function buildTransferData(){
-    return {
-      vt:1,
-      nome: studentName || "",
-      turma: studentClass || "",
-      solved: progress.solved || {},
-      activity: progress.activity || [],
-      activityCounts: progress.activityCounts || {},
-      examProgress: examProgress || {},
-      examScores: examScores || {},
-      planWatched: (planProgress && planProgress.watched) || {}
-    };
-  }
-  function encodeTransfer(data){
-    try{ return b64EncodeUnicode(JSON.stringify(data)); }catch(e){ return ""; }
-  }
-  function decodeTransfer(code){
-    try{
-      const obj = JSON.parse(b64DecodeUnicode(String(code).trim()));
-      if(!obj || typeof obj!=="object" || !obj.solved) return null;
-      return obj;
-    }catch(e){ return null; }
-  }
   // Junta os dados importados aos deste dispositivo sem apagar nada que já cá esteja:
   // uma questão marcada "correct" num dos lados mantém-se correct; datas de atividade juntam-se;
   // exames/vídeos marcados como feitos num dos lados ficam feitos; o nome/turma só é adotado
   // se este dispositivo ainda não tiver nenhum definido.
-  function importTransferData(obj){
-    Object.keys(obj.solved||{}).forEach(function(qid){
-      const incoming = obj.solved[qid];
-      const local = progress.solved[qid];
-      if(!local || (incoming && incoming.status==="correct" && local.status!=="correct")){
-        progress.solved[qid] = incoming;
-      }
-    });
-    const days = new Set(progress.activity||[]);
-    (obj.activity||[]).forEach(function(d){ days.add(d); });
-    progress.activity = Array.from(days);
-    const counts = progress.activityCounts || {};
-    Object.keys(obj.activityCounts||{}).forEach(function(d){
-      counts[d] = Math.max(counts[d]||0, obj.activityCounts[d]||0);
-    });
-    progress.activityCounts = counts;
-    saveProgress(progress);
-
-    Object.keys(obj.examProgress||{}).forEach(function(k){
-      if(obj.examProgress[k]) examProgress[k] = true;
-    });
-    saveExamProgress(examProgress);
-    Object.keys(obj.examScores||{}).forEach(function(k){
-      if(examScores[k] == null && typeof obj.examScores[k] === "number") examScores[k] = obj.examScores[k];
-    });
-    saveExamScores(examScores);
-
-    if(!planProgress.watched) planProgress.watched = {};
-    Object.keys(obj.planWatched||{}).forEach(function(k){
-      if(obj.planWatched[k]) planProgress.watched[k] = true;
-    });
-    savePlanProgress(planProgress);
-
-    if(!studentName && obj.nome){ studentName = obj.nome; saveNome(studentName); }
-    if(!studentClass && obj.turma){ studentClass = obj.turma; saveTurmaAluno(studentClass); }
-  }
 
   /* ================= STATE ================= */
   const ui = {
@@ -4619,21 +4491,6 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     draft: {},             // qid -> numeric input draft string
     continuing: {},        // qid -> true depois de escolher "Tentar de novo" no ecrã de escolha (transient)
     openShown: {},         // qid -> true quando o aluno pediu a resolução de um exercício de resposta aberta (transient)
-    nomeError:false,       // aviso "escreve o teu nome completo" no resumo
-    turmaAlunoError:false, // aviso "escreve a tua turma" no resumo
-    resumoOpen:false,      // resultado do resumo gerado está visível
-    resumoData:null,       // dados do último resumo gerado
-    copyMsg:"",            // mensagem transitória depois de copiar o código
-    turmaOpen:false,       // painel "Área do professor" está aberto
-    turmaMsg:"",           // mensagem transitória do painel do professor
-    turmaUnlocked:loadProfUnlock(), // PIN já validado neste dispositivo
-    turmaPinError:false,   // aviso "PIN incorreto"
-    transferCode:"",       // código de transferência gerado neste dispositivo
-    transferCopyMsg:"",    // mensagem transitória depois de copiar o código de transferência
-    transferImportMsg:"",  // mensagem depois de tentar importar um código
-    transferImportError:false,
-    storageNoticeDismissed:false, // aviso suave de cópia de segurança fechado nesta sessão
-    canDownload:false             // capacidade "downloads" disponível neste ecrã (ficheiro de cópia de segurança)
   };
 
   /* ================= RENDER ================= */
@@ -5402,113 +5259,12 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
         <h3 class="section-title">Plano de estudos com vídeos</h3>
         ${barRow("Vídeos marcados como vistos", plSt.watched, plSt.total, "var(--physics)")}
       </section>
-
-      <section class="stats-section transfer-section">
-        <h3 class="section-title">Continuar noutro dispositivo</h3>
-        <p class="resumo-hint">O teu progresso fica guardado só neste dispositivo/browser — se usares uma janela privada/anónima, o modo convidado, ou se limparem os dados do navegador, perde-se. Por isso, guarda aqui uma cópia de segurança de vez em quando. Serve também para passar o progresso para outro aparelho (por exemplo, do telemóvel para o computador): gera um código aqui e cola-o no outro dispositivo.</p>
-        <div class="transfer-grid">
-          <div class="transfer-box">
-            <p class="transfer-box-title">Gerar código deste dispositivo</p>
-            <button class="btn ghost" data-action="gerar-transferencia">📦 Gerar código de transferência</button>
-            ${ui.canDownload ? `<button class="btn ghost" data-action="download-backup">💾 Guardar como ficheiro</button>` : ""}
-            ${ui.transferCode ? `
-              <textarea class="resumo-text" id="transfer-codigo-box" readonly rows="4">${escapeHtml(ui.transferCode)}</textarea>
-              <button class="btn ghost" data-action="copy-transfer-code">📋 Copiar código</button>
-              ${ui.transferCopyMsg ? `<p class="resumo-copy-msg">${escapeHtml(ui.transferCopyMsg)}</p>` : ""}
-            ` : ""}
-          </div>
-          <div class="transfer-box">
-            <p class="transfer-box-title">Recuperar progresso de um código</p>
-            <textarea id="transfer-import-input" rows="4" placeholder="Cola aqui o código gerado no outro dispositivo..."></textarea>
-            <button class="btn primary" data-action="import-transfer-code">Importar progresso</button>
-            <label class="transfer-box-title" for="transfer-file-input" style="font-weight:600">…ou escolhe um ficheiro de cópia de segurança:</label>
-            <input type="file" id="transfer-file-input" accept=".txt,.json,text/plain">
-            ${ui.transferImportMsg ? `<p class="${ui.transferImportError ? "resumo-error" : "resumo-copy-msg"}">${escapeHtml(ui.transferImportMsg)}</p>` : ""}
-          </div>
-        </div>
-      </section>
-
-      <section class="stats-section resumo-section">
-        <h3 class="section-title">O meu progresso, para o professor</h3>
-        <p class="resumo-hint">Identifica-te com o nome completo (primeiro e último nome) e a turma, e gera um código com o teu progresso atual. Copia o código e envia-o ao professor (por email, Teams, ou outro meio). Os teus dados ficam sempre só neste dispositivo — nada é enviado automaticamente.</p>
-        <div class="resumo-form">
-          <input type="text" id="nome-input" class="resumo-input-nome" placeholder="Nome completo (primeiro e último nome)" value="${escapeAttr(studentName)}" maxlength="60">
-          <input type="text" id="turma-aluno-input" class="resumo-input-turma" placeholder="Turma (ex.: 10ºA)" value="${escapeAttr(studentClass)}" maxlength="20">
-          <button class="btn primary" data-action="gerar-resumo">📤 Gerar resumo</button>
-        </div>
-        ${ui.nomeError ? `<p class="resumo-error">Escreve o teu nome completo (primeiro e último nome).</p>` : ""}
-        ${ui.turmaAlunoError ? `<p class="resumo-error">Escreve a tua turma.</p>` : ""}
-        ${ui.resumoOpen && ui.resumoData ? renderResumoResult() : ""}
-      </section>
-
-      <section class="stats-section turma-section">
-        <button class="turma-toggle" data-action="toggle-turma" aria-expanded="${ui.turmaOpen}">🔒 Área do professor ${ui.turmaOpen ? "▾" : "▸"}</button>
-        ${ui.turmaOpen ? (ui.turmaUnlocked ? renderTurmaPanel() : renderTurmaPinGate()) : ""}
-      </section>
     `;
   }
 
-  function renderResumoResult(){
-    const d = ui.resumoData;
-    const code = encodeResumo(d);
-    const texto = formatResumoText(d, code);
-    return `
-      <div class="resumo-result">
-        <textarea class="resumo-text" id="resumo-codigo-box" readonly rows="8">${escapeHtml(texto)}</textarea>
-        <div class="resumo-actions">
-          <button class="btn ghost" data-action="copy-resumo-codigo">📋 Copiar código</button>
-        </div>
-        ${ui.copyMsg ? `<p class="resumo-copy-msg">${ui.copyMsg}</p>` : ""}
-      </div>`;
-  }
 
-  function turmaChave(s){ return (s.nome||"").trim().toLowerCase() + "|" + (s.turma||"").trim().toLowerCase(); }
 
-  function renderTurmaPinGate(){
-    return `
-      <div class="turma-pin-gate">
-        <p class="turma-hint">Esta área é só para o professor. Introduz o PIN para continuar.</p>
-        <div class="turma-form">
-          <input type="password" id="turma-pin-input" placeholder="PIN" maxlength="40" autocomplete="off">
-          <button class="btn primary" data-action="submit-turma-pin">Entrar</button>
-        </div>
-        ${ui.turmaPinError ? `<p class="resumo-error">PIN incorreto.</p>` : ""}
-      </div>`;
-  }
 
-  function renderTurmaPanel(){
-    const rows = turma.map(s=>`
-      <tr>
-        <td>${escapeHtml(s.nome)}</td>
-        <td class="mono">${escapeHtml(s.turma||"")}</td>
-        <td class="mono">${escapeHtml(s.data||"")}</td>
-        <td class="mono">${s.corretos}/${s.resolvidos}</td>
-        <td class="mono">${s.acerto}%</td>
-        <td class="mono">${s.streak}</td>
-        <td class="mono">${s.examesFeitos}/${s.examesTotal}</td>
-        <td class="mono">${s.videosVistos}/${s.videosTotal}</td>
-        <td><button class="turma-remove" data-action="remove-turma" data-chave="${escapeAttr(turmaChave(s))}" aria-label="Remover ${escapeAttr(s.nome)}">✕</button></td>
-      </tr>`).join("");
-    return `
-      <div class="turma-panel">
-        <div class="turma-panel-head">
-          <p class="turma-hint">Cola aqui o código que um aluno te enviou (por email ou copiado da app dele) para o adicionares ao teu registo — se já existir um aluno com o mesmo nome e turma, o registo é atualizado. Estes dados ficam guardados só neste navegador/dispositivo, nunca são partilhados automaticamente.</p>
-          <button class="turma-lock-btn" data-action="lock-turma" title="Bloquear esta área outra vez">🔒 Bloquear</button>
-        </div>
-        <div class="turma-form">
-          <textarea id="turma-input" rows="2" placeholder="Cola aqui o código do aluno..."></textarea>
-          <button class="btn primary" data-action="add-turma-code">Adicionar</button>
-        </div>
-        ${ui.turmaMsg ? `<p class="turma-msg">${escapeHtml(ui.turmaMsg)}</p>` : ""}
-        ${turma.length ? `
-        <div class="turma-table-wrap">
-          <table class="turma-table">
-            <thead><tr><th>Aluno</th><th>Turma</th><th>Data</th><th>Corretos</th><th>Acerto</th><th>Sequência</th><th>Exames</th><th>Vídeos</th><th></th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>` : `<p class="turma-empty">Ainda sem alunos registados.</p>`}
-      </div>`;
-  }
 
   function render(){
     if(contaGate()){ contaRenderGate(); return; }
@@ -5583,235 +5339,38 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     render();
   }
 
-  function gerarResumo(){
-    const nomeInput = document.getElementById("nome-input");
-    const turmaInput = document.getElementById("turma-aluno-input");
-    studentName = nomeInput ? nomeInput.value : studentName;
-    studentClass = turmaInput ? turmaInput.value : studentClass;
-    saveNome(studentName);
-    saveTurmaAluno(studentClass);
 
-    const nomeOk = nomeCompletoValido(studentName);
-    const turmaOk = !!(studentClass && studentClass.trim());
-    ui.nomeError = !nomeOk;
-    ui.turmaAlunoError = !turmaOk;
-    if(!nomeOk || !turmaOk){
-      ui.resumoOpen = false;
-      render();
-      return;
-    }
-    ui.resumoData = buildResumoData();
-    ui.resumoOpen = true;
-    ui.copyMsg = "";
-    render();
-  }
 
-  function copyResumoCodigo(){
-    if(!ui.resumoData) return;
-    const code = encodeResumo(ui.resumoData);
-    const finish = function(ok){
-      ui.copyMsg = ok ? "Código copiado!" : "Não foi possível copiar automaticamente — seleciona o texto acima e copia manualmente.";
-      render();
-    };
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(code).then(function(){ finish(true); }).catch(function(){ finish(false); });
-    } else {
-      const box = document.getElementById("resumo-codigo-box");
-      if(box){
-        try{ box.select(); document.execCommand("copy"); finish(true); }catch(e){ finish(false); }
-      } else finish(false);
-    }
-  }
-
-  function gerarTransferencia(){
-    ui.transferCode = encodeTransfer(buildTransferData());
-    ui.transferCopyMsg = "";
-    render();
-  }
 
   /* ---- Aviso de armazenamento e cópia de segurança ---- */
   function answeredCount(){ return Object.keys((progress && progress.solved) || {}).length; }
-  function backupStale(){
-    const t = loadLastBackup();
-    return !t || (Date.now() - t) > 7*24*3600*1000;
-  }
   function renderStorageNotice(){
     const el = document.getElementById("storageNotice");
     if(!el) return;
     let html = "";
     if(storageState.failed){
       html = `<div class="storage-notice alerta">
-        <strong class="sn-title">⚠️ Atenção: este navegador não está a guardar o teu progresso</strong>
-        <p>Podes continuar a fazer exercícios, mas <b>tudo o que fizeres desaparece quando fechares ou recarregares esta página</b>. Isto costuma acontecer quando:</p>
+        <strong class="sn-title">Atenção: este navegador não está a guardar dados</strong>
+        <p>Podes continuar a fazer exercícios, mas <b>terás de entrar de novo sempre que recarregares ou fechares esta página</b>. O progresso fica guardado na tua conta enquanto houver ligação à internet. Isto costuma acontecer quando:</p>
         <ul>
           <li>estás numa <b>janela privada / anónima</b> ou em <b>modo convidado</b>;</li>
           <li>a página foi aberta <b>dentro de outra aplicação</b> (WhatsApp, Teams, Classroom, e-mail…) — abre-a no Chrome/Safari;</li>
           <li>o navegador bloqueia ou apaga os dados dos sites (definições de privacidade ou conta da escola).</li>
         </ul>
-        <p>Abre a ligação numa janela normal. Se não for possível, <b>antes de fechares guarda uma cópia de segurança</b> e usa-a para recuperar o progresso depois.</p>
-        <div class="sn-actions"><button class="btn primary" data-action="go-backup">💾 Guardar cópia de segurança</button></div>
-      </div>`;
-    } else if(!ui.storageNoticeDismissed && answeredCount()>=3 && backupStale()){
-      html = `<div class="storage-notice">
-        <strong class="sn-title">💾 Guarda uma cópia de segurança do teu progresso</strong>
-        <p>O progresso fica guardado apenas <b>neste navegador</b>. Se usares uma janela privada, limpares os dados do navegador ou mudares de aparelho, perde-se. Demora 10 segundos a guardar uma cópia.</p>
-        <div class="sn-actions">
-          <button class="btn primary" data-action="go-backup">Fazer cópia agora</button>
-          <button class="btn ghost" data-action="dismiss-storage-notice">Agora não</button>
-        </div>
       </div>`;
     }
     if(el.innerHTML !== html) el.innerHTML = html;
   }
-  function goBackup(){
-    ui.mode = "progress"; ui.view = "home";
-    ui.transferCode = encodeTransfer(buildTransferData());
-    ui.transferCopyMsg = "";
-    render();
-    requestAnimationFrame(function(){
-      const sec = document.querySelector(".transfer-section");
-      if(sec) sec.scrollIntoView({behavior:"smooth", block:"start"});
-    });
-  }
-  function downloadBackupFile(){
-    const code = encodeTransfer(buildTransferData());
-    const d = new Date();
-    const pad = function(n){ return String(n).padStart(2,"0"); };
-    const name = "verifica-fqa-progresso-" + d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()) + ".txt";
-    ui.transferCopyMsg = "";
-    try{
-      window.claude.use("downloads").then(function(dl){
-        if(!dl){ ui.canDownload = false; ui.transferCopyMsg = "Guardar ficheiro não está disponível aqui — usa «Copiar código»."; render(); return; }
-        return dl.save({filename:name, data:code}).then(function(){
-          markBackup();
-          ui.transferCopyMsg = "Ficheiro de cópia de segurança guardado!";
-          render();
-        }, function(err){
-          if(err && err.code==="declined") return;
-          ui.transferCopyMsg = "Não foi possível guardar o ficheiro — usa «Copiar código».";
-          render();
-        });
-      });
-    }catch(e){
-      ui.transferCopyMsg = "Não foi possível guardar o ficheiro — usa «Copiar código».";
-      render();
-    }
-  }
-  function importarFicheiro(file){
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(){
-      const decoded = decodeTransfer(String(reader.result||""));
-      if(!decoded){
-        ui.transferImportError = true;
-        ui.transferImportMsg = "Ficheiro inválido — escolhe um ficheiro «verifica-fqa-progresso» guardado por esta app.";
-      } else {
-        importTransferData(decoded);
-        ui.transferImportError = false;
-        ui.transferImportMsg = "Progresso importado do ficheiro e juntado ao deste dispositivo!";
-      }
-      render();
-    };
-    reader.onerror = function(){
-      ui.transferImportError = true;
-      ui.transferImportMsg = "Não foi possível ler o ficheiro.";
-      render();
-    };
-    reader.readAsText(file);
-  }
-  // Deteta se o ecrã permite guardar ficheiros (capacidade "downloads"); se sim, mostra o botão.
-  try{
-    if(window.claude && typeof window.claude.use==="function"){
-      window.claude.use("downloads").then(function(dl){
-        if(dl){ ui.canDownload = true; render(); }
-      }).catch(function(){});
-    }
-  }catch(e){ /* ignore */ }
   window.addEventListener("beforeunload", function(e){
     if(storageState.failed && answeredCount()>0){ e.preventDefault(); e.returnValue = ""; }
   });
 
-  function copyTransferCode(){
-    if(!ui.transferCode) return;
-    const finish = function(ok){
-      if(ok) markBackup();
-      ui.transferCopyMsg = ok ? "Código copiado!" : "Não foi possível copiar automaticamente — seleciona o texto acima e copia manualmente.";
-      render();
-    };
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(ui.transferCode).then(function(){ finish(true); }).catch(function(){ finish(false); });
-    } else {
-      const box = document.getElementById("transfer-codigo-box");
-      if(box){
-        try{ box.select(); document.execCommand("copy"); finish(true); }catch(e){ finish(false); }
-      } else finish(false);
-    }
-  }
 
-  function importarTransferencia(){
-    const ta = document.getElementById("transfer-import-input");
-    const raw = ta ? ta.value : "";
-    const decoded = decodeTransfer(raw);
-    if(!decoded){
-      ui.transferImportError = true;
-      ui.transferImportMsg = "Código inválido — verifica se copiaste o código todo.";
-      render();
-      return;
-    }
-    importTransferData(decoded);
-    ui.transferImportError = false;
-    ui.transferImportMsg = "Progresso importado e juntado ao deste dispositivo!";
-    if(ta) ta.value = "";
-    render();
-  }
 
-  function toggleTurma(){ ui.turmaOpen = !ui.turmaOpen; render(); }
 
-  function submitTurmaPin(){
-    const input = document.getElementById("turma-pin-input");
-    const val = input ? input.value : "";
-    if(val.trim().toLowerCase() === PROF_PIN.toLowerCase()){
-      ui.turmaUnlocked = true;
-      ui.turmaPinError = false;
-      saveProfUnlock(true);
-    } else {
-      ui.turmaPinError = true;
-    }
-    render();
-  }
 
-  function lockTurma(){
-    ui.turmaUnlocked = false;
-    ui.turmaPinError = false;
-    saveProfUnlock(false);
-    render();
-  }
 
-  function addTurmaCode(){
-    const ta = document.getElementById("turma-input");
-    const raw = ta ? ta.value : "";
-    const decoded = decodeResumo(raw);
-    if(!decoded){
-      ui.turmaMsg = "Código inválido — verifica se copiaste o código todo.";
-      render();
-      return;
-    }
-    const idx = turma.findIndex(function(s){ return turmaChave(s)===turmaChave(decoded); });
-    if(idx>=0) turma[idx] = decoded; else turma.push(decoded);
-    turma.sort(function(a,b){
-      return (a.turma||"").localeCompare(b.turma||"", "pt") || a.nome.localeCompare(b.nome, "pt");
-    });
-    saveTurma(turma);
-    ui.turmaMsg = "Resumo de " + decoded.nome + " (" + (decoded.turma||"sem turma") + ") adicionado/atualizado.";
-    if(ta) ta.value = "";
-    render();
-  }
 
-  function removeTurmaEntry(chave){
-    turma = turma.filter(function(s){ return turmaChave(s)!==chave; });
-    saveTurma(turma);
-    render();
-  }
 
   document.addEventListener("click", function(e){
     const el = e.target.closest("[data-action]");
@@ -5853,19 +5412,6 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       render();
     }
     else if(action==="open-self"){ submitOpen(el.dataset.qid, el.dataset.ok==="1"); }
-    else if(action==="gerar-resumo"){ gerarResumo(); }
-    else if(action==="copy-resumo-codigo"){ copyResumoCodigo(); }
-    else if(action==="gerar-transferencia"){ gerarTransferencia(); }
-    else if(action==="go-backup"){ goBackup(); }
-    else if(action==="dismiss-storage-notice"){ ui.storageNoticeDismissed = true; renderStorageNotice(); }
-    else if(action==="download-backup"){ downloadBackupFile(); }
-    else if(action==="copy-transfer-code"){ copyTransferCode(); }
-    else if(action==="import-transfer-code"){ importarTransferencia(); }
-    else if(action==="toggle-turma"){ toggleTurma(); }
-    else if(action==="submit-turma-pin"){ submitTurmaPin(); }
-    else if(action==="lock-turma"){ lockTurma(); }
-    else if(action==="add-turma-code"){ addTurmaCode(); }
-    else if(action==="remove-turma"){ removeTurmaEntry(el.dataset.chave); }
   });
 
   document.addEventListener("keydown", function(e){
@@ -5887,22 +5433,11 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       if(pct) pct.textContent = v == null ? "" : Math.round(100*v/EXAM_MAX_PTS)+"% · guardado";
       return;
     }
-    if(e.target && e.target.id==="transfer-file-input"){
-      const f = e.target.files && e.target.files[0];
-      if(f) importarFicheiro(f);
-      e.target.value = "";
-    }
   });
 
   document.addEventListener("input", function(e){
     if(e.target && e.target.matches('input[id^="input-"], textarea[id^="input-"]')){
       ui.draft[e.target.dataset.qid] = e.target.value;
-    } else if(e.target && e.target.id==="nome-input"){
-      studentName = e.target.value;
-      saveNome(studentName);
-    } else if(e.target && e.target.id==="turma-aluno-input"){
-      studentClass = e.target.value;
-      saveTurmaAluno(studentClass);
     }
   });
 
@@ -6054,6 +5589,35 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     qSave();
     examProgress = merged; saveExamProgress(examProgress);
     examScores = nota; saveExamScores(examScores);
+    syncPlanFrom(all);
+  }
+  /* Vídeos vistos do Plano de estudos: mesma tabela, exercicio_id "pl-<id do vídeo>", resposta "_exame_video" (visto)
+     ou "_exame_video_off" (desmarcado). O prefixo "_exame" faz com que não contem como exercícios. */
+  function vidKey(url){
+    const m = /youtu\.be\/([\w-]+)|[?&]v=([\w-]+)/.exec(String(url || ""));
+    return m ? (m[1] || m[2]) : String(url || "").replace(/[^\w-]/g, "").slice(-40);
+  }
+  function contaLogVideo(url, done){
+    ctLogRow({ exercicio_id: "pl-" + vidKey(url), tipo: "open", resposta: done ? "_exame_video" : "_exame_video_off", certa: null, viu_resolucao: false });
+  }
+  function syncPlanFrom(all){
+    const estado = {}, visto = new Set();
+    all.forEach(r => {
+      if(r.resposta !== "_exame_video" && r.resposta !== "_exame_video_off") return;
+      const k = String(r.exercicio_id).replace(/^pl-/, "");
+      estado[k] = r.resposta === "_exame_video"; visto.add(k);
+    });
+    const w = {}, local = (planProgress && planProgress.watched) || {};
+    STUDY_PLAN.forEach(sec => sec.domains.forEach(dom => dom.temas.forEach(t => t.videos.forEach(v => {
+      const k = vidKey(v.url);
+      if(visto.has(k)){ if(estado[k]) w[v.url] = true; }
+      else if(local[v.url]){
+        w[v.url] = true;   // marca antiga, só neste dispositivo: envia-a
+        conta.queue.push({ aluno_id: conta.user.id, em: new Date().toISOString(), exercicio_id: "pl-" + k, tipo: "open", resposta: "_exame_video", certa: null, viu_resolucao: false });
+      }
+    }))));
+    qSave();
+    planProgress = { watched: w }; savePlanProgress(planProgress);
   }
   function rebuild(rows){
     const solved = {}, days = [], seen = new Set(), counts = {};
@@ -6239,7 +5803,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     conta.sem = ctLoadLS(CONTA_SEM_KEY) === "1";
     qLoad();
     conta.state = "loading";
-    const wd = setTimeout(() => { if(conta.state === "loading"){ conta.state = "out"; conta.err = "Sem ligação ao servidor. Podes continuar sem conta e entrar mais tarde."; render(); } }, 9000);
+    const wd = setTimeout(() => { if(conta.state === "loading"){ conta.state = "out"; conta.err = "Sem ligação ao servidor. Verifica a ligação à internet e tenta de novo."; render(); } }, 9000);
     conta.sb.auth.getSession().then(r => {
       const s = r && r.data && r.data.session;
       if(s && s.user){
@@ -6346,7 +5910,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
   }
 
   /* ---------- ecrã de entrada ---------- */
-  function contaGate(){ return conta.state === "loading" || (conta.state === "out" && !conta.sem); }
+  function contaGate(){ return conta.state === "loading" || conta.state === "out"; }
   function contaRenderGate(){
     document.body.classList.add("auth-mode");
     const el = document.getElementById("app");
@@ -6418,7 +5982,6 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     }
     const rodape = conta.tab === "prof" ? "" : `<div class="ct-foot">
         <button type="button" class="ct-link" data-action="conta-tab" data-tab="prof">Sou professor</button>
-        <div class="ct-sem">Preferes não criar conta? <button type="button" class="ct-link" data-action="conta-sem">Continuar sem conta</button>. O progresso fica só neste dispositivo.</div>
       </div>`;
     el.innerHTML = `<div class="ct-card">${corpo}${rodape}</div>`;
   }
@@ -6430,10 +5993,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     document.body.classList.remove("auth-mode");
     document.body.classList.toggle("mode-turma", ui.mode === "turma" && contaIsProf());
     if(conta.state === "off" || contaGate()){ el.innerHTML = ""; return; }
-    if(conta.state === "out"){
-      el.innerHTML = `<div class="ct-bar"><span class="ct-who">Sem conta · o progresso fica só neste dispositivo</span><button type="button" class="ct-link" data-action="conta-abrir">Entrar</button></div>`;
-      return;
-    }
+    if(conta.state === "out"){ el.innerHTML = ""; return; }
     const p = conta.perfil, t = conta.turma;
     const isProf = p.papel === "professor";
     const n = qMine().length;
@@ -6888,7 +6448,6 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
     else if(a === "conta-criar") actCriar();
     else if(a === "conta-prof") actProf();
     else if(a === "conta-voltar"){ readForm(); conta.step = 1; conta.err = ""; render(); }
-    else if(a === "conta-sem"){ ctSaveLS(CONTA_SEM_KEY, "1"); conta.sem = true; conta.err = ""; render(); }
     else if(a === "conta-abrir"){ try{ localStorage.removeItem(CONTA_SEM_KEY); }catch(_){} conta.sem = false; conta.tab = "entrar"; conta.err = ""; render(); }
     else if(a === "conta-sair") doLogout();
     else if(a === "conta-importar") doImport();
