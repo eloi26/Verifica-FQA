@@ -5990,7 +5990,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
           <span class="ct-hint">Foi-te dado pelo professor.</span></div>
         <div class="ct-field"><label for="auth-alcunha">Nome</label>
           <input id="auth-alcunha" type="text" autocomplete="username" maxlength="24" value="${ctEsc(f.alcunha)}">
-          <span class="ct-hint">Primeiro nome e inicial do apelido, por exemplo: Ana S.</span></div>
+          <span class="ct-hint">Primeiro nome e apelido ou inicial de apelido</span></div>
         <div class="ct-field"><label for="auth-pin">PIN de 6 dígitos</label>
           <input id="auth-pin" class="ct-pin ct-mono" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="${pin2 ? "new-password" : "current-password"}" value="${ctEsc(f.pin)}"></div>
         ${pin2 ? `<div class="ct-field"><label for="auth-pin2">Repete o PIN</label>
@@ -6004,7 +6004,7 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
         <p class="ct-small">Esqueceste o PIN? Pede ao professor para o repor.</p>`;
     } else if(conta.tab === "primeira" && conta.step === 1){
       corpo = `<h1 class="ct-h1">Cria a tua conta</h1>
-        <p class="ct-muted">Precisas do código da turma. Escreve o teu primeiro nome e a inicial do apelido, e escolhe um PIN de 6 dígitos que consigas lembrar.</p>
+        <p class="ct-muted">Precisas do código da turma. Escreve o teu primeiro nome e o apelido (ou a inicial do apelido), e escolhe um PIN de 6 dígitos que consigas lembrar.</p>
         ${tabs}${campos(true)}${err}
         <button type="button" class="btn primary ct-big" data-action="conta-continuar" data-primary ${dis}>${conta.busy ? "A verificar…" : "Continuar"}</button>`;
     } else if(conta.tab === "primeira"){
