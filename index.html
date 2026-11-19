@@ -832,6 +832,63 @@
   .pwa-banner span{ flex:1 1 220px; line-height:1.4; }
   .pwa-banner .btn{ min-height:44px; }
   @media (min-width:701px){ .pwa-banner{ bottom:16px; left:auto; right:16px; margin:0; } }
+
+/* ===== Tabela Periódica ===== */
+:root{
+  --tp-alc:#FAD3CF; --tp-alt:#FBE0BD; --tp-tra:#FFF0A8; --tp-out:#D5EBC9; --tp-sem:#C7E8E1;
+  --tp-nao:#CFE1F8; --tp-hal:#E1D5F4; --tp-nob:#F6D0EA; --tp-lan:#E3E8BE; --tp-act:#EAD6C1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --tp-alc:#5B2B29; --tp-alt:#5A3F1E; --tp-tra:#585018; --tp-out:#2F4C27; --tp-sem:#1F4B45;
+    --tp-nao:#25405F; --tp-hal:#43365F; --tp-nob:#5A2D4F; --tp-lan:#464C20; --tp-act:#4F3A28;
+  }
+}
+:root[data-theme="dark"]{
+  --tp-alc:#5B2B29; --tp-alt:#5A3F1E; --tp-tra:#585018; --tp-out:#2F4C27; --tp-sem:#1F4B45;
+  --tp-nao:#25405F; --tp-hal:#43365F; --tp-nob:#5A2D4F; --tp-lan:#464C20; --tp-act:#4F3A28;
+}
+.tp-alc{background:var(--tp-alc)} .tp-alt{background:var(--tp-alt)} .tp-tra{background:var(--tp-tra)} .tp-out{background:var(--tp-out)}
+.tp-sem{background:var(--tp-sem)} .tp-nao{background:var(--tp-nao)} .tp-hal{background:var(--tp-hal)} .tp-nob{background:var(--tp-nob)}
+.tp-lan{background:var(--tp-lan)} .tp-act{background:var(--tp-act)}
+.tp-fab{position:fixed; right:14px; bottom:calc(88px + env(safe-area-inset-bottom,0px)); z-index:35; display:inline-flex; align-items:center; gap:8px;
+  padding:10px 14px; border-radius:999px; border:1px solid var(--line); background:var(--paper-raised); color:var(--physics-ink);
+  font:700 0.8rem var(--font-body); box-shadow:var(--shadow-md); cursor:pointer; min-height:44px}
+.tp-fab:hover{border-color:var(--physics)}
+.tp-fab:focus-visible,.tp-x:focus-visible,.tp-c:focus-visible,.tp-leg:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+@media (min-width:701px){ .tp-fab{bottom:20px; right:20px} }
+@media (max-width:420px){ .tp-fab{padding:10px 12px; right:10px} }
+body.auth-mode .tp-fab, body.tp-open .tp-fab{display:none}
+body.tp-open{overflow:hidden}
+.tp-ov{position:fixed; inset:0; z-index:90; background:rgba(19,28,39,0.55); display:flex; align-items:center; justify-content:center; padding:10px}
+.tp-ov[hidden]{display:none}
+.tp-box{background:var(--paper-raised); color:var(--ink); border-radius:18px; width:min(1040px,100%); max-height:100%; overflow:auto; padding:14px 14px 12px; box-shadow:var(--shadow-md)}
+.tp-top{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px}
+.tp-top h2{margin:0; font:700 1.1rem var(--font-display)}
+.tp-x{border:1px solid var(--line); background:var(--paper); color:var(--ink); width:38px; height:38px; border-radius:10px; font-size:1rem; cursor:pointer}
+.tp-det{display:flex; gap:12px; align-items:center; border-radius:12px; padding:10px 12px; margin-bottom:10px; border:1px solid var(--line); min-height:74px; color:var(--ink)}
+.tp-det-empty{background:var(--paper); color:var(--ink-soft); font-size:0.88rem}
+.tp-det-sym{display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:62px; padding:6px 8px; border-radius:10px; background:var(--paper-raised); border:1px solid var(--line)}
+.tp-det-sym span{font:600 0.72rem var(--font-mono); color:var(--ink-soft)}
+.tp-det-sym b{font:700 1.7rem var(--font-display); line-height:1}
+.tp-det-nome{font:700 1.05rem var(--font-display); margin-bottom:2px}
+.tp-det-lin{font-size:0.86rem; line-height:1.5} .tp-det-lin span{color:var(--ink-soft)}
+.tp-scroll{overflow-x:auto}
+.tp-grid{display:grid; grid-template-columns:18px repeat(18,minmax(0,1fr)); grid-template-rows:16px repeat(7,auto) 8px repeat(2,auto); gap:2px; min-width:340px}
+.tp-gh,.tp-ph{font:600 0.62rem var(--font-mono); color:var(--ink-faint); display:flex; align-items:center; justify-content:center}
+.tp-ref{font:600 0.5rem var(--font-mono); color:var(--ink-soft); display:flex; align-items:center; justify-content:center; border:1px dashed var(--line); border-radius:4px}
+.tp-c{position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; aspect-ratio:1/1.08; padding:0; border:1px solid transparent; border-radius:4px; color:var(--ink); cursor:pointer; font-family:var(--font-body); min-width:0}
+.tp-c .tp-s{font:700 0.62rem var(--font-body); line-height:1}
+.tp-c .tp-z{position:absolute; top:1px; left:2px; font:500 0.4rem var(--font-mono); color:var(--ink-soft); line-height:1; display:none}
+.tp-c.tp-sel{border-color:var(--ink); box-shadow:0 0 0 2px var(--ink) inset}
+.tp-c.tp-dim{opacity:0.22}
+.tp-c:hover{filter:brightness(0.95)}
+.tp-legs{display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 6px}
+.tp-leg{border:1px solid var(--line); border-radius:999px; padding:5px 10px; font:600 0.72rem var(--font-body); color:var(--ink); cursor:pointer}
+.tp-leg.tp-on{border-color:var(--ink); box-shadow:0 0 0 1px var(--ink) inset}
+.tp-nota{font-size:0.72rem; color:var(--ink-soft); margin:6px 0 0}
+@media (min-width:520px){ .tp-c .tp-s{font-size:0.82rem} .tp-c .tp-z{display:block; font-size:0.5rem} .tp-gh,.tp-ph{font-size:0.7rem} .tp-ref{font-size:0.62rem} }
+@media (min-width:900px){ .tp-c .tp-s{font-size:1rem} .tp-c .tp-z{font-size:0.6rem} .tp-grid{gap:3px} }
 </style>
 
 <div class="wrap">
@@ -6595,6 +6652,113 @@ LAB_EXERCISES.push(...[{"id":46,"subject":"fisica","titulo":"Plano inclinado: en
       });
     })();
   })();
+
+/* ================= TABELA PERIÓDICA (botão flutuante) ================= */
+(function tpInit(){
+  const RAW = "H|Hidrogénio|1,01;He|Hélio|4,00;Li|Lítio|6,94;Be|Berílio|9,01;B|Boro|10,81;C|Carbono|12,01;N|Nitrogénio (azoto)|14,01;O|Oxigénio|16,00;F|Flúor|19,00;Ne|Néon|20,18;Na|Sódio|22,99;Mg|Magnésio|24,31;Al|Alumínio|26,98;Si|Silício|28,09;P|Fósforo|30,97;S|Enxofre|32,07;Cl|Cloro|35,45;Ar|Árgon|39,95;K|Potássio|39,10;Ca|Cálcio|40,08;Sc|Escândio|44,96;Ti|Titânio|47,87;V|Vanádio|50,94;Cr|Crómio|52,00;Mn|Manganês|54,94;Fe|Ferro|55,85;Co|Cobalto|58,93;Ni|Níquel|58,69;Cu|Cobre|63,55;Zn|Zinco|65,38;Ga|Gálio|69,72;Ge|Germânio|72,63;As|Arsénio|74,92;Se|Selénio|78,97;Br|Bromo|79,90;Kr|Crípton|83,80;Rb|Rubídio|85,47;Sr|Estrôncio|87,62;Y|Ítrio|88,91;Zr|Zircónio|91,22;Nb|Nióbio|92,91;Mo|Molibdénio|95,95;Tc|Tecnécio|(98);Ru|Ruténio|101,07;Rh|Ródio|102,91;Pd|Paládio|106,42;Ag|Prata|107,87;Cd|Cádmio|112,41;In|Índio|114,82;Sn|Estanho|118,71;Sb|Antimónio|121,76;Te|Telúrio|127,60;I|Iodo|126,90;Xe|Xénon|131,29;Cs|Césio|132,91;Ba|Bário|137,33;La|Lantânio|138,91;Ce|Cério|140,12;Pr|Praseodímio|140,91;Nd|Neodímio|144,24;Pm|Promécio|(145);Sm|Samário|150,36;Eu|Európio|151,96;Gd|Gadolínio|157,25;Tb|Térbio|158,93;Dy|Disprósio|162,50;Ho|Hólmio|164,93;Er|Érbio|167,26;Tm|Túlio|168,93;Yb|Itérbio|173,05;Lu|Lutécio|174,97;Hf|Háfnio|178,49;Ta|Tântalo|180,95;W|Tungsténio|183,84;Re|Rénio|186,21;Os|Ósmio|190,23;Ir|Irídio|192,22;Pt|Platina|195,08;Au|Ouro|196,97;Hg|Mercúrio|200,59;Tl|Tálio|204,38;Pb|Chumbo|207,2;Bi|Bismuto|208,98;Po|Polónio|(209);At|Astato|(210);Rn|Rádon|(222);Fr|Frâncio|(223);Ra|Rádio|(226);Ac|Actínio|(227);Th|Tório|232,04;Pa|Protactínio|231,04;U|Urânio|238,03;Np|Neptúnio|(237);Pu|Plutónio|(244);Am|Amerício|(243);Cm|Cúrio|(247);Bk|Berquélio|(247);Cf|Califórnio|(251);Es|Einstéinio|(252);Fm|Férmio|(257);Md|Mendelévio|(258);No|Nobélio|(259);Lr|Laurêncio|(266);Rf|Rutherfórdio|(267);Db|Dúbnio|(268);Sg|Seabórgio|(269);Bh|Bóhrio|(270);Hs|Hássio|(277);Mt|Meitnério|(278);Ds|Darmstácio|(281);Rg|Roentgénio|(282);Cn|Copernício|(285);Nh|Nihónio|(286);Fl|Fleróvio|(289);Mc|Moscóvio|(290);Lv|Livermório|(293);Ts|Tenesso|(294);Og|Oganésson|(294)";
+  const EL = RAW.split(";").map((r,i)=>{ const p=r.split("|"); return {z:i+1, s:p[0], n:p[1], m:p[2]}; });
+  const CAT = {
+    alc:{l:"Metais alcalinos"}, alt:{l:"Metais alcalinoterrosos"}, tra:{l:"Metais de transição"},
+    out:{l:"Outros metais"}, sem:{l:"Semimetais"}, nao:{l:"Não metais"}, hal:{l:"Halogéneos"},
+    nob:{l:"Gases nobres"}, lan:{l:"Lantanídeos"}, act:{l:"Actinídeos"}
+  };
+  const setOf = a => new Set(a);
+  const NAO=setOf([1,6,7,8,15,16,34]), HAL=setOf([9,17,35,53,85,117]), NOB=setOf([2,10,18,36,54,86,118]),
+        ALC=setOf([3,11,19,37,55,87]), ALT=setOf([4,12,20,38,56,88]), SEM=setOf([5,14,32,33,51,52]),
+        OUT=setOf([13,31,49,50,81,82,83,84,113,114,115,116]);
+  function place(z){
+    // devolve {g (grupo ou 0), p (período), row, col}
+    let p, g;
+    if(z===1){p=1;g=1;} else if(z===2){p=1;g=18;}
+    else if(z<=4){p=2;g=z-2;} else if(z<=10){p=2;g=z+8;}
+    else if(z<=12){p=3;g=z-10;} else if(z<=18){p=3;g=z;}
+    else if(z<=36){p=4;g=z-18;} else if(z<=54){p=5;g=z-36;}
+    else if(z<=56){p=6;g=z-54;} else if(z<=71){p=6;g=0;}
+    else if(z<=86){p=6;g=z-68;} else if(z<=88){p=7;g=z-86;}
+    else if(z<=103){p=7;g=0;} else {p=7;g=z-100;}
+    let row=p, col=g;
+    if(g===0){ row = p===6 ? 9 : 10; col = 3 + (p===6 ? z-57 : z-89); }
+    return {g:g,p:p,row:row,col:col};
+  }
+  function cat(z){
+    if(NAO.has(z))return"nao"; if(HAL.has(z))return"hal"; if(NOB.has(z))return"nob"; if(ALC.has(z))return"alc";
+    if(ALT.has(z))return"alt"; if(SEM.has(z))return"sem"; if(OUT.has(z))return"out";
+    if(z>=57&&z<=71)return"lan"; if(z>=89&&z<=103)return"act"; return"tra";
+  }
+  EL.forEach(e=>{ Object.assign(e, place(e.z)); e.c=cat(e.z); });
+
+  let sel = null, filtro = null, lastFocus = null;
+  const root = document.createElement("div");
+  root.id = "tpRoot";
+  document.body.appendChild(root);
+
+  function cell(e){
+    return `<button type="button" class="tp-c tp-${e.c}${filtro&&filtro!==e.c?" tp-dim":""}${sel===e.z?" tp-sel":""}" data-tp-z="${e.z}" style="grid-row:${e.row+1};grid-column:${e.col+1}" aria-label="${e.n}, número atómico ${e.z}"><span class="tp-z">${e.z}</span><span class="tp-s">${e.s}</span></button>`;
+  }
+  function detalhe(){
+    if(sel==null) return `<div class="tp-det tp-det-empty">Toca num elemento para ver o nome, o número atómico, a massa atómica relativa, o grupo e o período.</div>`;
+    const e = EL[sel-1];
+    const grupo = e.g ? e.g : "—";
+    const nota = e.g ? "" : (e.c==="lan" ? " (bloco f, entre o La e o Hf)" : " (bloco f, entre o Ac e o Rf)");
+    return `<div class="tp-det tp-${e.c}"><div class="tp-det-sym"><span>${e.z}</span><b>${e.s}</b></div>
+      <div class="tp-det-txt"><div class="tp-det-nome">${e.n}</div>
+      <div class="tp-det-lin"><span>Massa atómica relativa</span> <b>${e.m}</b></div>
+      <div class="tp-det-lin"><span>Grupo</span> <b>${grupo}</b> &nbsp; <span>Período</span> <b>${e.p}</b>${nota}</div>
+      <div class="tp-det-lin"><span>${CAT[e.c].l}</span></div></div></div>`;
+  }
+  function render(){
+    let heads = "";
+    for(let g=1; g<=18; g++) heads += `<span class="tp-gh" style="grid-row:1;grid-column:${g+1}">${g}</span>`;
+    for(let p=1; p<=7; p++) heads += `<span class="tp-ph" style="grid-row:${p+1};grid-column:1">${p}</span>`;
+    const ph = `<span class="tp-ref" style="grid-row:7;grid-column:4">57–71</span><span class="tp-ref" style="grid-row:8;grid-column:4">89–103</span>`;
+    const leg = Object.keys(CAT).map(k=>`<button type="button" class="tp-leg tp-${k}${filtro===k?" tp-on":""}" data-tp-cat="${k}" aria-pressed="${filtro===k}">${CAT[k].l}</button>`).join("");
+    root.innerHTML = `
+      <button type="button" class="tp-fab" id="tpFab" aria-label="Abrir a Tabela Periódica">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="currentColor"><rect x="2" y="3" width="4" height="4" rx="1"/><rect x="18" y="3" width="4" height="4" rx="1"/><rect x="2" y="9" width="4" height="4" rx="1"/><rect x="8" y="9" width="4" height="4" rx="1"/><rect x="14" y="9" width="4" height="4" rx="1"/><rect x="20" y="9" width="2" height="4" rx="1"/><rect x="2" y="15" width="4" height="4" rx="1"/><rect x="8" y="15" width="4" height="4" rx="1"/><rect x="14" y="15" width="4" height="4" rx="1"/></g></svg>
+        <span class="tp-fab-l">Tabela Periódica</span>
+      </button>
+      <div class="tp-ov" id="tpOv" hidden>
+        <div class="tp-box" role="dialog" aria-modal="true" aria-labelledby="tpTitulo">
+          <div class="tp-top"><h2 id="tpTitulo">Tabela Periódica</h2><button type="button" class="tp-x" id="tpX" aria-label="Fechar">✕</button></div>
+          ${detalhe()}
+          <div class="tp-scroll"><div class="tp-grid">${heads}${ph}${EL.map(cell).join("")}</div></div>
+          <div class="tp-legs">${leg}</div>
+          <p class="tp-nota">Massas atómicas relativas com duas casas decimais; entre parênteses, o número de massa do isótopo mais estável (elementos sem isótopos estáveis).</p>
+        </div>
+      </div>`;
+  }
+  function abrir(){
+    lastFocus = document.activeElement;
+    render();
+    const ov = document.getElementById("tpOv"); ov.hidden = false;
+    document.body.classList.add("tp-open");
+    document.getElementById("tpX").focus();
+  }
+  function fechar(){
+    const ov = document.getElementById("tpOv"); if(ov) ov.hidden = true;
+    document.body.classList.remove("tp-open");
+    const f = document.getElementById("tpFab"); if(f) f.focus();
+  }
+  function atualizar(){
+    const ov = document.getElementById("tpOv"); const sc = ov.querySelector(".tp-scroll");
+    const st = sc ? sc.scrollLeft : 0;
+    const open = !ov.hidden; render();
+    const ov2 = document.getElementById("tpOv"); ov2.hidden = !open;
+    const sc2 = ov2.querySelector(".tp-scroll"); if(sc2) sc2.scrollLeft = st;
+  }
+  root.addEventListener("click", ev=>{
+    const t = ev.target;
+    if(t.closest("#tpFab")){ abrir(); return; }
+    if(t.closest("#tpX")){ fechar(); return; }
+    if(t.id==="tpOv"){ fechar(); return; }
+    const c = t.closest("[data-tp-z]"); if(c){ sel = +c.dataset.tpZ; atualizar(); const b=document.querySelector('[data-tp-z="'+sel+'"]'); if(b) b.focus(); return; }
+    const l = t.closest("[data-tp-cat]"); if(l){ filtro = filtro===l.dataset.tpCat ? null : l.dataset.tpCat; atualizar(); return; }
+  });
+  document.addEventListener("keydown", ev=>{
+    if(ev.key==="Escape" && document.body.classList.contains("tp-open")) fechar();
+  });
+  render();
+})();
   contaInit();
   render();
 })();
