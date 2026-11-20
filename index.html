@@ -889,6 +889,135 @@ body.tp-open{overflow:hidden}
 .tp-nota{font-size:0.72rem; color:var(--ink-soft); margin:6px 0 0}
 @media (min-width:520px){ .tp-c .tp-s{font-size:0.82rem} .tp-c .tp-z{display:block; font-size:0.5rem} .tp-gh,.tp-ph{font-size:0.7rem} .tp-ref{font-size:0.62rem} }
 @media (min-width:900px){ .tp-c .tp-s{font-size:1rem} .tp-c .tp-z{font-size:0.6rem} .tp-grid{gap:3px} }
+
+/* ===== Simulador de exame ===== */
+.sim-entry{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin:0 0 18px; padding:16px 18px; background:var(--physics-soft); border:1px solid var(--line); border-radius:16px; }
+.sim-entry-txt{ flex:1 1 300px; min-width:0; }
+.sim-entry-txt h2{ margin:2px 0 4px; font-family:var(--font-display); font-size:1.25rem; }
+.sim-entry-txt p{ margin:0; color:var(--ink-soft); font-size:.92rem; line-height:1.45; }
+.sim-entry-eyebrow{ display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--physics-ink); }
+.sim-wrap{ display:flex; flex-direction:column; gap:14px; max-width:880px; margin:0 auto; }
+.sim-card{ background:var(--paper-raised); border:1px solid var(--line); border-radius:16px; padding:16px 18px; box-shadow:var(--shadow-sm); }
+.sim-card h3{ margin:0 0 8px; font-family:var(--font-display); font-size:1.08rem; }
+.sim-card p{ margin:0 0 10px; line-height:1.5; }
+.sim-resume{ border-color:var(--physics); }
+.sim-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.sim-check{ display:flex; gap:10px; align-items:center; margin:0 0 12px; font-size:.95rem; }
+.sim-check input{ width:20px; height:20px; accent-color:var(--physics); }
+.sim-small{ font-size:.82rem; color:var(--ink-soft); line-height:1.45; margin:8px 0 0; }
+.sim-muted{ color:var(--ink-soft); font-size:.9rem; }
+.sim-list{ margin:0; padding-left:20px; display:flex; flex-direction:column; gap:8px; line-height:1.5; font-size:.93rem; }
+.sim-tablewrap{ overflow-x:auto; }
+.sim-table{ width:100%; border-collapse:collapse; font-size:.9rem; }
+.sim-table th,.sim-table td{ padding:8px 10px; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; }
+.sim-table th{ color:var(--ink-soft); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; }
+.sim-table .num{ text-align:right; font-variant-numeric:tabular-nums; }
+.sim-best{ display:inline-block; margin-left:6px; padding:1px 7px; border-radius:999px; background:var(--good-soft); color:var(--good); font-size:.72rem; font-weight:700; }
+/* barra do teste */
+.sim-bar{ position:sticky; top:0; z-index:20; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:10px 14px 0; box-shadow:var(--shadow-sm); overflow:hidden; }
+.sim-bar-main{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding-bottom:10px; }
+.sim-bar-main .btn{ margin-left:auto; min-height:42px; }
+.sim-clock{ font-size:1.05rem; font-weight:700; padding:3px 10px; border-radius:8px; background:var(--paper-raised); border:1px solid var(--line); }
+.sim-clock.low{ color:var(--bad); border-color:var(--bad); }
+.sim-bar-track{ height:5px; background:var(--line); margin:0 -14px; }
+.sim-bar-track i{ display:block; height:100%; width:0; background:var(--physics); transition:width .25s; }
+.sim-intro{ margin:0; }
+.sim-item{ background:var(--paper-raised); border:1px solid var(--line); border-radius:16px; padding:16px 18px; box-shadow:var(--shadow-sm); scroll-margin-top:90px; }
+.sim-item-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.sim-num{ display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:30px; padding:0 6px; border-radius:8px; background:var(--ink); color:var(--paper); font-weight:700; font-size:.9rem; }
+.sim-chip{ display:inline-block; padding:2px 9px; border-radius:999px; border:1px solid var(--line); font-size:.75rem; font-weight:600; color:var(--ink-soft); }
+.sim-chip.phys{ background:var(--physics-soft); color:var(--physics-ink); border-color:transparent; }
+.sim-chip.chem{ background:var(--chemistry-soft); color:var(--chemistry); border-color:transparent; }
+.sim-chip.req{ color:var(--ink); }
+.sim-chip.cnt{ background:var(--good-soft); color:var(--good); border-color:transparent; }
+.sim-pts{ margin-left:auto; font-size:.8rem; font-weight:700; color:var(--ink-soft); }
+.sim-prompt{ line-height:1.55; overflow-x:auto; }
+.sim-prompt img{ max-width:100%; height:auto; }
+.sim-item .options{ margin-top:12px; }
+.sim-item .numeric-row{ margin-top:12px; }
+.sim-item textarea{ width:100%; box-sizing:border-box; font:inherit; padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:var(--paper); color:var(--ink); resize:vertical; }
+.sim-item .open-row{ margin-top:12px; }
+.sim-end{ justify-content:center; padding:6px 0 20px; }
+/* resultado */
+.sim-score{ background:var(--paper-raised); border:1px solid var(--line); border-radius:18px; padding:20px; box-shadow:var(--shadow-md); }
+.sim-score.done{ border-color:var(--good); }
+.sim-score-n{ display:flex; align-items:baseline; gap:10px; }
+.sim-score-n .mono{ font-size:3rem; font-weight:700; line-height:1; font-family:var(--font-mono); }
+.sim-score-n small{ color:var(--ink-soft); font-size:1rem; }
+.sim-score-s{ margin:8px 0 16px; color:var(--ink-soft); }
+.sim-split{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; }
+.sim-split > div{ display:flex; flex-direction:column; gap:3px; font-size:.82rem; color:var(--ink-soft); }
+.sim-split b{ font-size:1.3rem; color:var(--ink); }
+.sim-mbar{ display:block; height:6px; border-radius:3px; background:var(--line); overflow:hidden; }
+.sim-mbar i{ display:block; height:100%; border-radius:3px; }
+.sim-mbar i.phys{ background:var(--physics); }
+.sim-mbar i.chem{ background:var(--chemistry); }
+.sim-mbar i.neu{ background:var(--ink-faint); }
+.sim-note{ padding:12px 14px; border-radius:12px; font-size:.92rem; line-height:1.45; }
+.sim-note.warn{ background:var(--chemistry-soft); color:var(--ink); border:1px solid var(--chemistry); }
+.sim-saved{ color:var(--good); font-weight:700; }
+.sim-h2{ margin:10px 0 0; font-family:var(--font-display); font-size:1.2rem; }
+.sim-revlist{ display:flex; flex-direction:column; gap:8px; }
+.sim-rev{ background:var(--paper-raised); border:1px solid var(--line); border-left-width:4px; border-radius:12px; }
+.sim-rev.ok{ border-left-color:var(--good); }
+.sim-rev.no{ border-left-color:var(--bad); }
+.sim-rev.pend{ border-left-color:var(--chemistry); }
+.sim-rev summary{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 12px; cursor:pointer; list-style:none; }
+.sim-rev summary::-webkit-details-marker{ display:none; }
+.sim-rev-t{ font-size:.9rem; }
+.sim-rev-p{ margin-left:auto; font-weight:700; }
+.sim-rev-body{ padding:0 14px 14px; }
+.sim-st{ font-weight:700; }
+.sim-st.ok{ color:var(--good); } .sim-st.no{ color:var(--bad); } .sim-st.pend{ color:var(--chemistry); font-size:.78rem; }
+.sim-ans{ margin:10px 0 0; line-height:1.5; }
+.sim-pre{ white-space:pre-wrap; }
+.sim-expl{ margin-top:12px; padding:12px 14px; background:var(--paper); border:1px solid var(--line); border-radius:12px; line-height:1.55; overflow-x:auto; }
+.sim-self{ margin-top:14px; }
+.sim-self p{ margin:0 0 8px; }
+.sim-self-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(104px,1fr)); gap:8px; }
+.sim-lv{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 6px; border:1px solid var(--line); border-radius:12px; background:var(--paper-raised); color:var(--ink); font:inherit; cursor:pointer; min-height:56px; }
+.sim-lv b{ font-size:1.05rem; } .sim-lv span{ font-size:.72rem; color:var(--ink-soft); text-align:center; }
+.sim-lv.on{ border-color:var(--physics); box-shadow:0 0 0 1px var(--physics) inset; background:var(--physics-soft); }
+.sim-lv:disabled{ opacity:.7; cursor:default; }
+.sim-lv:focus-visible,.sim-rev summary:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+/* diálogo */
+.sim-dlg{ position:fixed; inset:0; z-index:200; background:rgba(10,14,21,.55); display:flex; align-items:center; justify-content:center; padding:16px; }
+.sim-dlg-box{ background:var(--paper-raised); color:var(--ink); border:1px solid var(--line); border-radius:16px; padding:20px; max-width:420px; width:100%; box-shadow:var(--shadow-md); }
+.sim-dlg-box h2{ margin:0 0 8px; font-family:var(--font-display); font-size:1.15rem; }
+.sim-dlg-box p{ margin:0 0 16px; line-height:1.5; }
+.sim-dlg-acts{ display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; }
+/* painel do professor */
+.ct-simbox{ margin-top:14px; }
+@media (max-width:480px){
+  .sim-card,.sim-item{ padding:14px; }
+  .sim-score-n .mono{ font-size:2.4rem; }
+  .sim-bar-main .btn{ margin-left:0; width:100%; }
+}
+/* escolha do tipo de teste e matriz de tópicos */
+.sim-first{ margin:0 0 12px !important; }
+.sim-modes{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:10px; margin-bottom:14px; }
+.sim-mode{ display:flex; flex-direction:column; align-items:flex-start; gap:4px; text-align:left; padding:12px 14px; border:1.5px solid var(--line); border-radius:14px; background:var(--paper-raised); color:var(--ink); font:inherit; cursor:pointer; min-height:72px; }
+.sim-mode b{ font-size:1rem; }
+.sim-mode span{ font-size:.84rem; color:var(--ink-soft); line-height:1.4; }
+.sim-mode.on{ border-color:var(--physics); background:var(--physics-soft); box-shadow:0 0 0 1px var(--physics) inset; }
+.sim-mode:focus-visible,.sim-link:focus-visible,.sim-mx-chip:focus-within{ outline:2px solid var(--focus); outline-offset:2px; }
+.sim-matrix{ margin:0 0 14px; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--paper); }
+.sim-mx-top{ display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+.sim-link{ background:none; border:0; padding:4px 2px; color:var(--physics-ink); font:inherit; font-size:.82rem; text-decoration:underline; cursor:pointer; }
+.sim-mx-g{ border:0; margin:0 0 12px; padding:0; min-width:0; }
+.sim-mx-g legend{ float:left; font-family:var(--font-display); font-weight:700; font-size:.98rem; padding:0; margin-right:10px; }
+.sim-mx-g .sim-link{ float:right; }
+.sim-mx-g > *{ clear:both; }
+.sim-mx-dom{ margin:10px 0 4px; font-size:.74rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); font-weight:600; }
+.sim-mx-chip{ display:flex; align-items:center; gap:10px; padding:7px 10px; margin:0 0 4px; border:1px solid var(--line); border-radius:10px; background:var(--paper-raised); font-size:.92rem; cursor:pointer; min-height:40px; }
+.sim-mx-chip input{ width:20px; height:20px; flex:none; accent-color:var(--physics); }
+.sim-mx-chip:has(input:checked){ border-color:var(--physics); background:var(--physics-soft); }
+.sim-mx-info{ margin:8px 0 0; font-size:.88rem; line-height:1.45; }
+.sim-warn{ color:var(--bad); }
+.sim-okmsg{ color:var(--good); }
+.sim-score-k{ font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; font-weight:700; color:var(--ink-soft); margin-bottom:6px; }
+.sim-score-tp{ display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 0; }
+.btn:disabled{ opacity:.5; cursor:not-allowed; }
 </style>
 
 <div class="wrap">
@@ -4646,7 +4775,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
   function renderModeTabs(){
     modeTabsEl.innerHTML = `
       <button class="mode-tab" data-action="mode-calendario" aria-label="Calendário de preparação de Exame" aria-selected="${ui.mode==='calendario'}">${tabIco('calendario')}<span>Calendário</span></button>
-      <button class="mode-tab" data-action="mode-topics" aria-selected="${ui.mode==='topics'}">${tabIco('topics')}<span>Tópicos</span></button>
+      <button class="mode-tab" data-action="mode-topics" aria-selected="${ui.mode==='topics'||ui.mode==='sim'}">${tabIco('topics')}<span>Tópicos</span></button>
       <button class="mode-tab" data-action="mode-progress" aria-selected="${ui.mode==='progress'}">${tabIco('progress')}<span>Progresso</span></button>
       <button class="mode-tab" data-action="mode-exams" aria-selected="${ui.mode==='exams'}">${tabIco('exams')}<span>Exames</span></button>
       <button class="mode-tab" data-action="mode-plano" aria-selected="${ui.mode==='plano'}">${tabIco('plano')}<span>Plano</span></button>
@@ -4855,7 +4984,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
       mainContentHtml = sections || '<p style="color:var(--ink-soft)">Sem tópicos para este filtro.</p>';
     }
 
-    app.innerHTML = renderHeroHome() + `
+    app.innerHTML = renderHeroHome() + simHomeCard() + `
       <div class="filters" role="group" aria-label="Filtrar por disciplina">
         <button class="chip phys" data-action="filter-subject" data-value="todas" aria-pressed="${ui.subjectFilter==='todas'}">Todas</button>
         <button class="chip phys" data-action="filter-subject" data-value="fisica" aria-pressed="${ui.subjectFilter==='fisica'}">Física</button>
@@ -5401,6 +5530,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
     contaRenderBar();
     if(ui.mode==="turma" && !contaIsProf()) ui.mode = "topics";
     if(ui.mode==="turma"){ contaRenderTurma(); return; }
+    if(ui.mode==="sim"){ simRender(); return; }
     if(ui.mode==="calendario"){ renderCalendarioHome(); return; }
     if(ui.mode==="progress"){ renderProgressHome(); return; }
     if(ui.mode==="exams"){ renderExamsHome(); return; }
@@ -5716,6 +5846,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
     examProgress = merged; saveExamProgress(examProgress);
     examScores = nota; saveExamScores(examScores);
     syncPlanFrom(all);
+    simSyncFrom(all);
   }
   /* Vídeos vistos do Plano de estudos: mesma tabela, exercicio_id "pl-<id do vídeo>", resposta "_exame_video" (visto)
      ou "_exame_video_off" (desmarcado). O prefixo "_exame" faz com que não contem como exercícios. */
@@ -6177,6 +6308,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
       const rb = rebuild(rows);
       const nEx = Object.keys(rebuildExams(rows)).length;
       const vN = Object.values(rebuildScores(rows)).map(o => o.nota);
+      const sims = simParseRows(rows), simBest = sims.length ? Math.max.apply(null, sims.map(h => h.total)) : null;
       const notaMedia = vN.length ? Math.round(vN.reduce((a, b) => a + b, 0) / vN.length) : null;
       let certos = 0, tentados = 0, nT = 0, nC = 0, ultimo = 0;
       Object.keys(rb.solved).forEach(k => { tentados++; if(rb.solved[k].status === "correct") certos++; });
@@ -6199,7 +6331,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
         const pct = o.c / o.n;
         if(!fraco || pct < fraco.pct || (pct === fraco.pct && o.n > fraco.n)) fraco = { pct: pct, n: o.n, title: o.t.title };
       });
-      return { id: a.id, alcunha: a.alcunha, exames: nEx, notaMedia: notaMedia, certos: certos, tentados: tentados, nT: nT, nC: nC,
+      return { id: a.id, alcunha: a.alcunha, simN: sims.length, simBest: simBest, exames: nEx, notaMedia: notaMedia, certos: certos, tentados: tentados, nT: nT, nC: nC,
                pct: nT ? Math.round(100 * nC / nT) : null, ultimo: ultimo, streak: streakOf(rb.activity), fraco: fraco,
                diasSem: ultimo ? ctDiasDesde(ultimo) : null };
     });
@@ -6281,7 +6413,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
       const k = y.year + "-" + p.key, n = exNotas[k];
       if(exFeitos[k] || n) exames.push({ ano: y.year, fase: p.label, feito: !!exFeitos[k], em: exData[k] || (n ? n.em : 0), nota: n ? n.nota : null, hist: n ? n.hist : [], emNota: n ? n.em : 0 });
     }));
-    return { al: al, exames: exames, nT: nT, nC: nC, certos: certos, tentados: tentados, ultimo: ultimo, streak: streakOf(rb.activity),
+    return { al: al, sims: simParseRows(rows), exames: exames, nT: nT, nC: nC, certos: certos, tentados: tentados, ultimo: ultimo, streak: streakOf(rb.activity),
              pct: nT ? Math.round(100 * nC / nT) : null, temas: temas, erros: erros, serie: serie, total14: serie.reduce((a, b) => a + b.n, 0) };
   }
   function contaRenderAluno(P, turma, errH, msgH){
@@ -6293,6 +6425,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
         <div class="ct-kpi"><div class="n">${D.ultimo ? ctHa(ctDiasDesde(D.ultimo)) : "—"}</div><div class="l">Último acesso</div></div>
         <div class="ct-kpi"><div class="n">${D.streak}</div><div class="l">Dias seguidos</div></div>
         <div class="ct-kpi"><div class="n">${D.exames.length}/${examStats().total}</div><div class="l">Exames resolvidos</div></div>
+        <div class="ct-kpi"><div class="n">${D.sims.length ? Math.max.apply(null, D.sims.map(h => h.total)) + "/" + EXAM_MAX_PTS : "—"}</div><div class="l">Melhor nota no simulador</div></div>
         <div class="ct-kpi"><div class="n">${(() => { const ns = D.exames.filter(x => x.nota != null); return ns.length ? Math.round(ns.reduce((a, x) => a + x.nota, 0) / ns.length) + "/" + EXAM_MAX_PTS : "—"; })()}</div><div class="l">Nota média nos exames</div></div>
       </div>`;
     const max = Math.max(1, ...D.serie.map(x => x.n));
@@ -6326,6 +6459,10 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
           <span class="ct-muted">${x.feito ? "resolvido" : "sem marcar como resolvido"}${x.em ? " · " + ctFmtData(x.em).slice(0, 10) : ""}${x.hist.length ? " · classificações anteriores: " + x.hist.join(", ") : ""}</span></li>`).join("")}</ul>
          <p class="ct-small">Marcados e classificados pelo próprio aluno na app (autocorreção). A classificação mostrada é a mais recente.</p>`
       : `<p class="ct-muted">Ainda não marcou nenhum exame como resolvido.</p>`;
+    const simH = D.sims.length
+      ? `<div class="ct-tablewrap"><table class="ct-table"><thead><tr><th>Data</th><th>Tipo</th><th class="num">Nota (/${EXAM_MAX_PTS})</th><th class="num">%</th><th class="num">Física</th><th class="num">Química</th><th class="num">Esc. múltipla</th><th class="num">Cálculo e abertas</th></tr></thead><tbody>${D.sims.slice().reverse().map(h => `<tr><td>${ctFmtData(h.t)}</td><td>${h.md === "t" ? "Tópicos: " + ctEsc(simTopicNames(h.mk).join("; ")) : "Global"}</td><td class="num"><b>${h.total}</b></td><td class="num">${Math.round(100 * h.total / EXAM_MAX_PTS)}%</td><td class="num">${h.f}</td><td class="num">${h.q}</td><td class="num">${h.m}</td><td class="num">${h.a}</td></tr>`).join("")}</tbody></table></div>
+         <p class="ct-small">Testes gerados pela app (23 itens, 200 pontos), globais ou por tópicos. Itens de escolha múltipla e de cálculo corrigidos automaticamente; respostas abertas autoavaliadas pelo aluno.</p>`
+      : `<p class="ct-muted">Ainda não fez nenhum teste no simulador.</p>`;
     return `<div class="ct-panel">
         <div class="ct-head"><div class="ct-row"><button type="button" class="btn ghost" data-action="conta-aluno-fechar">← Voltar à turma</button></div>
           <div class="ct-row"><button type="button" class="btn ghost" data-action="conta-recarregar" ${P.loading ? "disabled" : ""}>${P.loading ? "A atualizar…" : "↻ Atualizar"}</button>
@@ -6335,6 +6472,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
         ${errH}${msgH}${kpi}
         <h2 class="ct-h2">Atividade nos últimos 14 dias</h2>${atividade}
         <h2 class="ct-h2">Evolução por tema</h2>${temas}
+        <h2 class="ct-h2">Simulador de teste <span class="ct-count">${D.sims.length}</span></h2>${simH}
         <h2 class="ct-h2">Exames nacionais resolvidos <span class="ct-count">${D.exames.length}</span></h2>${examesH}
         <h2 class="ct-h2">Exercícios com mais erros</h2>${erros}</div>`;
   }
@@ -6374,7 +6512,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
         return `<tr>
           <td class="ct-nm"><button type="button" class="ct-link" data-action="conta-aluno" data-id="${ctEsc(s.id)}" title="Ver o detalhe deste aluno">${ctEsc(s.alcunha)}</button></td>
           <td class="num">${s.certos}</td><td class="num">${s.tentados}</td>
-          <td class="num">${s.pct == null ? "—" : s.pct + "%"}</td><td class="num">${s.nT}</td><td class="num">${s.exames}</td><td class="num">${s.notaMedia == null ? "—" : s.notaMedia}</td>
+          <td class="num">${s.pct == null ? "—" : s.pct + "%"}</td><td class="num">${s.nT}</td><td class="num">${s.exames}</td><td class="num">${s.simN ? s.simBest + " <span class=\"ct-muted\">(" + s.simN + ")</span>" : "—"}</td><td class="num">${s.notaMedia == null ? "—" : s.notaMedia}</td>
           <td>${ctFmtData(s.ultimo)}</td><td class="num">${s.streak}</td>
           <td>${s.fraco ? ctEsc(s.fraco.title) + " <span class=\"ct-muted\">(" + Math.round(s.fraco.pct * 100) + "%)</span>" : "—"}</td>
           <td class="ct-acts">
@@ -6383,7 +6521,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
           </td></tr>`;
       }).join("");
       const tabela = C.lista.length ? `<div class="ct-tablewrap"><table class="ct-table">
-          <thead><tr><th>Aluno</th><th class="num">Certos</th><th class="num">Tentados</th><th class="num">% certas</th><th class="num">Tentativas</th><th class="num" title="Sessões de exame marcadas como resolvidas pelo aluno">Exames</th><th class="num" title="Média das classificações (em 200 pontos) que o aluno registou nos exames">Nota média</th><th>Último acesso</th><th class="num">Dias seg.</th><th>Tema mais fraco</th><th></th></tr></thead>
+          <thead><tr><th>Aluno</th><th class="num">Certos</th><th class="num">Tentados</th><th class="num">% certas</th><th class="num">Tentativas</th><th class="num" title="Sessões de exame marcadas como resolvidas pelo aluno">Exames</th><th class="num" title="Melhor nota no simulador de exame (e número de testes)">Simulador</th><th class="num" title="Média das classificações (em 200 pontos) que o aluno registou nos exames">Nota média</th><th>Último acesso</th><th class="num">Dias seg.</th><th>Tema mais fraco</th><th></th></tr></thead>
           <tbody>${linhas}</tbody></table></div>
           <p class="ct-small">Clica no nome de um aluno para ver o detalhe. «Certos» e «Tentados» contam exercícios distintos; «% certas» conta tentativas; «Exames» são as sessões de exame que o aluno marcou como resolvidas (em ${examStats().total}); «Nota média» é a média das classificações (0–${EXAM_MAX_PTS}) que registou nos exames.</p>`
         : `<p class="ct-muted">Ainda não há alunos nesta turma. Dá-lhes o código <b class="ct-mono">${ctEsc(turma.codigo)}</b> para criarem conta.</p>`;
@@ -6449,8 +6587,8 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
   function exportResumo(){
     const P = conta.prof, t = P.turmas.find(x => x.id === P.turmaId); if(!t) return;
     const C = profCompute();
-    const rows = [["Aluno", "Turma", "Exercícios certos", "Exercícios tentados", "Tentativas", "Tentativas certas", "% certas", "Exames resolvidos", "Nota média nos exames (/200)", "Último acesso", "Dias sem atividade", "Dias seguidos", "Tema mais fraco"]];
-    C.lista.forEach(s => rows.push([s.alcunha, t.nome, s.certos, s.tentados, s.nT, s.nC, s.pct == null ? "" : s.pct, s.exames, s.notaMedia == null ? "" : s.notaMedia, s.ultimo ? ctFmtData(s.ultimo) : "", s.diasSem == null ? "" : s.diasSem, s.streak, s.fraco ? s.fraco.title : ""]));
+    const rows = [["Aluno", "Turma", "Exercícios certos", "Exercícios tentados", "Tentativas", "Tentativas certas", "% certas", "Exames resolvidos", "Nota média nos exames (/200)", "Último acesso", "Dias sem atividade", "Dias seguidos", "Tema mais fraco", "Testes no simulador", "Melhor nota no simulador (/" + EXAM_MAX_PTS + ")"]];
+    C.lista.forEach(s => rows.push([s.alcunha, t.nome, s.certos, s.tentados, s.nT, s.nC, s.pct == null ? "" : s.pct, s.exames, s.notaMedia == null ? "" : s.notaMedia, s.ultimo ? ctFmtData(s.ultimo) : "", s.diasSem == null ? "" : s.diasSem, s.streak, s.fraco ? s.fraco.title : "", s.simN, s.simBest == null ? "" : s.simBest]));
     saveFile("verifica-fqa-resumo-" + ctSlug(t.nome) + "-" + fileStamp() + ".csv", csvText(rows));
   }
   function exportExames(){
@@ -6465,6 +6603,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
         if(!feitos[k] && !n) return;
         rows.push([a.alcunha, t.nome, y.year, p.label, feitos[k] ? "sim" : "não", n ? n.nota : "", n ? Math.round(100 * n.nota / EXAM_MAX_PTS) : "", n ? n.hist.join(", ") : "", ctFmtData(n ? n.em : (datas[k] || 0))]);
       }));
+      simParseRows(rs).forEach(h => rows.push([a.alcunha, t.nome, "Simulador", (h.md === "t" ? "Teste por tópicos: " + simTopicNames(h.mk).join("; ") : "Teste global") + " (" + ctFmtData(h.t).slice(0, 10) + ")", "sim", h.total, Math.round(100 * h.total / EXAM_MAX_PTS), "", ctFmtData(h.t)]));
     });
     saveFile("verifica-fqa-exames-" + ctSlug(t.nome) + "-" + fileStamp() + ".csv", csvText(rows));
   }
@@ -6615,6 +6754,534 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
       profLoadData().catch(err => { conta.prof.err = mapErr(err); }).then(() => { conta.prof.loading = false; render(); });
     }
   });
+
+/* ================= SIMULADOR DE EXAME =================
+   Teste com a estrutura do Exame Final Nacional de Física e Química A (prova 715, 1.ª fase 2026):
+   23 itens · 15 obrigatórios (160 pontos) + 8 opcionais, em que contam os 4 melhores (40 pontos) · 200 pontos.
+   As perguntas são sorteadas do banco de exercícios da app. Escolha múltipla e cálculo são corrigidos
+   automaticamente; os 2 itens de resposta aberta (texto) são autoavaliados pelo aluno, por níveis.
+   Cada teste concluído fica guardado na tabela «tentativas» como  exercicio_id "sim-<id>"  e
+   resposta "_exame_sim:<total>/<física>/<química>/<escolha múltipla>/<abertas>"  (não conta como exercício). */
+const SIM_MAX = 200, SIM_MINUTES = 120, SIM_RX = /^_exame_sim:(\d{1,3})\/(\d{1,3})\/(\d{1,3})\/(\d{1,3})\/(\d{1,3})(?:\/(g|t[0-9a-z]{1,6}))?$/;
+const SIM_BLANK = /_{4,}/;
+// a: área (f = Física, q = Química) · t: tipo · d: dificuldade · p: cotação · r: obrigatório (1) ou opcional (0) · tp: tópicos de onde se sorteia
+const SIM_SLOTS = [
+  {a:"q",t:"mcq",d:"facil",p:10,r:1,tp:["q10-2","q10-1"]},
+  {a:"q",t:"mcq",d:"moderado",p:10,r:0,tp:["q10-1","q10-2","q10-3"]},
+  {a:"q",t:"mcq",d:"facil",p:10,r:1,tp:["q10-5","q10-1"]},
+  {a:"q",t:"mcq",d:"facil",p:10,r:0,tp:["q10-1","q10-3","q10-4"]},
+  {a:"q",t:"mcq",d:"moderado",p:10,r:0,tp:["q11-4"]},
+  {a:"q",t:"mcq",d:"facil",p:10,r:0,tp:["q11-2"]},
+  {a:"q",t:"numeric",d:"dificil",p:12,r:1,tp:["q11-2","q11-1"]},
+  {a:"q",t:"open",d:"moderado",p:10,r:1,tp:["q10-5","q10-6"]},
+  {a:"q",t:"numeric",d:"dificil",p:12,r:1,tp:["q10-5","q10-1"]},
+  {a:"f",t:"mcq",d:"facil",p:10,r:1,tp:["f11-4"]},
+  {a:"f",t:"numeric",d:"facil",p:10,r:1,tp:["f11-4"]},
+  {a:"q",t:"numeric",d:"moderado",p:10,r:1,tp:["q11-3"]},
+  {a:"q",t:"mcq",d:"facil",p:10,r:1,tp:["q11-3"]},
+  {a:"f",t:"mcq",d:"facil",p:10,r:0,tp:["f10-3"]},
+  {a:"f",t:"mcq",d:"moderado",p:10,r:0,tp:["f10-3"]},
+  {a:"f",t:"mcq",d:"facil",p:10,r:1,tp:["f10-2"]},
+  {a:"f",t:"numeric",d:"dificil",p:12,r:1,tp:["f10-2","f10-4"]},
+  {a:"f",t:"mcq",d:"moderado",p:10,r:0,tp:["f11-5","f10-2"]},
+  {a:"f",t:"numeric",d:"dificil",p:12,r:1,tp:["f11-1","f11-6"]},
+  {a:"f",t:"mcq",d:"moderado",p:10,r:0,tp:["f11-2","f11-3","f11-6"]},
+  {a:"f",t:"open",d:"dificil",p:12,r:1,tp:["f11-6","f11-1","f11-2","f11-3"]},
+  {a:"f",t:"mcq",d:"moderado",p:10,r:1,tp:["f11-2","f11-3","f11-6"],rx:SIM_BLANK},
+  {a:"f",t:"mcq",d:"facil",p:10,r:1,tp:["f11-3","f11-2"]}
+];
+/* Matriz de tópicos (teste por tópicos). A ORDEM É FIXA: o número de cada entrada fica gravado nas notas guardadas.
+   d = domínio das Aprendizagens Essenciais · a = ano · s = f (Física) / q (Química) · t = tópicos do banco de exercícios
+   f = (opcional) filtro por palavras no enunciado, para tópicos transversais como as reações fotoquímicas */
+const SIM_DOMS = {
+  "d10-fis-1":"Energia e sua Conservação", "d10-qui-1":"Elementos Químicos e sua Organização", "d10-qui-2":"Propriedades e Transformações da Matéria",
+  "d11-fis-1":"Mecânica", "d11-fis-2":"Ondas e Eletromagnetismo", "d11-qui-1":"Equilíbrio Químico", "d11-qui-2":"Reações em Sistemas Aquosos"
+};
+const SIM_MATRIX = [
+  {d:"d10-fis-1",a:10,s:"f",n:"Energia e movimentos",t:["f10-1"]},
+  {d:"d10-fis-1",a:10,s:"f",n:"Energia e fenómenos elétricos",t:["f10-2","f10-4"]},
+  {d:"d10-fis-1",a:10,s:"f",n:"Energia, fenómenos térmicos e radiação",t:["f10-3"]},
+  {d:"d10-qui-1",a:10,s:"q",n:"Massa e tamanho dos átomos",t:["q10-1"]},
+  {d:"d10-qui-1",a:10,s:"q",n:"Energia dos eletrões nos átomos (espetros, modelo de Bohr)",t:["q10-2","q10-7"]},
+  {d:"d10-qui-1",a:10,s:"q",n:"Tabela Periódica",t:["q10-3"]},
+  {d:"d10-qui-2",a:10,s:"q",n:"Ligação química",t:["q10-4"]},
+  {d:"d10-qui-2",a:10,s:"q",n:"Gases e dispersões",t:["q10-5"]},
+  {d:"d10-qui-2",a:10,s:"q",n:"Transformações químicas",t:["q10-6"]},
+  {d:"d10-qui-2",a:10,s:"q",n:"Reações fotoquímicas (ozono)",t:["q10-4","q10-5","q10-6"],f:/ozono|fotodissocia|fotoqu[ií]mic|radicais? livres?|estratosfera|CFC|clorofluorcarbon/i},
+  {d:"d11-fis-1",a:11,s:"f",n:"Tempo, posição, velocidade e aceleração",t:["f11-1","f11-6"]},
+  {d:"d11-fis-1",a:11,s:"f",n:"Interações e seus efeitos",t:["f11-2"]},
+  {d:"d11-fis-1",a:11,s:"f",n:"Forças e movimentos",t:["f11-3","f11-6"]},
+  {d:"d11-fis-2",a:11,s:"f",n:"Sinais e ondas",t:["f11-4","f11-7"]},
+  {d:"d11-fis-2",a:11,s:"f",n:"Eletromagnetismo e ondas eletromagnéticas",t:["f11-5","f11-7"]},
+  {d:"d11-qui-1",a:11,s:"q",n:"Aspetos quantitativos das reações químicas",t:["q11-1"]},
+  {d:"d11-qui-1",a:11,s:"q",n:"Estado de equilíbrio e extensão das reações",t:["q11-2"]},
+  {d:"d11-qui-2",a:11,s:"q",n:"Reações ácido-base",t:["q11-3"]},
+  {d:"d11-qui-2",a:11,s:"q",n:"Reações de oxidação-redução",t:["q11-4"]},
+  {d:"d11-qui-2",a:11,s:"q",n:"Soluções e equilíbrio de solubilidade",t:["q11-5"]}
+];
+const SIM_NEED = {mcq:15, numeric:6, open:2};
+const SIM_TYPE_LBL = {mcq:"Escolha múltipla", numeric:"Cálculo", open:"Resposta aberta"};
+const SIM_LEVELS = [[100,"Totalmente certa"],[75,"Quase completa"],[50,"A meio"],[25,"Pouco certa"],[0,"Errada"]];
+let SIM = {cur:null, hist:[], recent:[], timer:false, mode:"g", sel:[], view:"home", loadedFor:null};
+let simTick = null;
+
+function simKey(){ return "fqa_sim_v1_" + ((typeof conta !== "undefined" && conta.user && conta.user.id) || "anon"); }
+function simLoad(){
+  const k = simKey(); if(SIM.loadedFor === k) return;
+  SIM = {cur:null, hist:[], recent:[], timer:false, mode:"g", sel:[], view:"home", loadedFor:k};
+  try{
+    const o = JSON.parse(localStorage.getItem(k) || "null");
+    if(o){ SIM.cur = o.cur || null; SIM.hist = Array.isArray(o.hist) ? o.hist : []; SIM.recent = Array.isArray(o.recent) ? o.recent : []; SIM.timer = !!o.timer; SIM.mode = o.mode === "t" ? "t" : "g"; SIM.sel = Array.isArray(o.sel) ? o.sel.filter(i => i >= 0 && i < SIM_MATRIX.length) : []; }
+  }catch(e){}
+}
+function simSave(){
+  try{ localStorage.setItem(simKey(), JSON.stringify({cur:SIM.cur, hist:SIM.hist, recent:SIM.recent, timer:SIM.timer, mode:SIM.mode, sel:SIM.sel})); }catch(e){}
+}
+function simAddHist(h){
+  if(SIM.hist.some(x => x.id === h.id)) return false;
+  SIM.hist.push(h); SIM.hist.sort((a, b) => a.t - b.t);
+  return true;
+}
+// Linhas do servidor → lista de testes {id, t, total, f, q, m, a}
+function simParseRows(rows){
+  const m = {};
+  (rows || []).forEach(r => {
+    if(!r || typeof r.resposta !== "string" || String(r.exercicio_id).indexOf("sim-") !== 0) return;
+    const x = SIM_RX.exec(r.resposta); if(!x) return;
+    const id = String(r.exercicio_id).slice(4);
+    const tp = x[6] && x[6].charAt(0) === "t";
+    m[id] = {id:id, t:Date.parse(r.em) || 0, total:+x[1], f:+x[2], q:+x[3], m:+x[4], a:+x[5], md:tp ? "t" : "g", mk:tp ? (parseInt(x[6].slice(1), 36) || 0) : 0};
+  });
+  return Object.keys(m).map(k => m[k]).sort((a, b) => a.t - b.t);
+}
+// Junta ao histórico local os testes que estão no servidor (outro dispositivo)
+function simSyncFrom(rows){
+  simLoad();
+  let ch = false;
+  simParseRows(rows).forEach(h => { if(simAddHist(h)) ch = true; });
+  if(ch){ simSave(); if(ui.mode === "sim" && SIM.view === "home") render(); }
+}
+function simMask(sel){ return (sel || []).reduce((a, i) => a | (1 << i), 0); }
+function simSelOf(mask){ const r = []; for(let i = 0; i < SIM_MATRIX.length; i++) if(mask & (1 << i)) r.push(i); return r; }
+function simTopicNames(mask){ return simSelOf(mask).map(i => SIM_MATRIX[i].n); }
+function simPlain2(h){ return String(h || "").replace(/<[^>]*>/g, " "); }
+// Perguntas dos tópicos escolhidos (união, sem repetições)
+function simPool(sel){
+  const seen = new Set(), out = [];
+  (sel || []).forEach(i => {
+    const e = SIM_MATRIX[i]; if(!e) return;
+    ALL_QUESTIONS.forEach(q => {
+      if(seen.has(q.id) || e.t.indexOf(q.topicId) < 0 || !simValid(q)) return;
+      if(e.f && !e.f.test(simPlain2(q.prompt))) return;
+      seen.add(q.id); out.push(q);
+    });
+  });
+  return out;
+}
+function simPoolInfo(sel){
+  const n = {mcq:0, numeric:0, open:0};
+  simPool(sel).forEach(q => { if(n[q.type] != null) n[q.type]++; });
+  const falta = [];
+  if(n.mcq < SIM_NEED.mcq) falta.push((SIM_NEED.mcq - n.mcq) + " de escolha múltipla");
+  if(n.numeric < SIM_NEED.numeric) falta.push((SIM_NEED.numeric - n.numeric) + " de cálculo");
+  if(n.open < SIM_NEED.open) falta.push((SIM_NEED.open - n.open) + " de resposta aberta");
+  return {n:n, ok:!falta.length && (sel || []).length > 0, falta:falta, vazio:!(sel || []).length};
+}
+function simArea(q){ const t = TOPIC_BY_ID[q.topicId]; return t ? (t.subject === "fisica" ? "f" : "q") : "q"; }
+function simValid(q){
+  if(!q || !q.prompt || !q.expl) return false;
+  if(q.type === "mcq") return Array.isArray(q.options) && q.options.length >= 3 && q.correct != null;
+  if(q.type === "numeric") return isFinite(q.answer);
+  return q.type === "open";
+}
+function simPick(slot, used, recent){
+  const ok = q => !used.has(q.id) && simValid(q) && q.type === slot.t;
+  const inTp = q => slot.tp.indexOf(q.topicId) >= 0;
+  const tries = [
+    q => inTp(q) && q.difficulty === slot.d && (!slot.rx || slot.rx.test(q.prompt)),
+    q => inTp(q) && q.difficulty === slot.d,
+    q => inTp(q),
+    q => simArea(q) === slot.a && q.difficulty === slot.d,
+    q => simArea(q) === slot.a
+  ];
+  for(let i = 0; i < tries.length; i++){
+    let c = ALL_QUESTIONS.filter(q => ok(q) && tries[i](q));
+    if(!c.length) continue;
+    const fresh = c.filter(q => !recent.has(q.id) && !(progress.solved[q.id] && progress.solved[q.id].status));
+    const notRecent = c.filter(q => !recent.has(q.id));
+    c = fresh.length ? fresh : (notRecent.length ? notRecent : c);
+    return c[Math.floor(Math.random() * c.length)];
+  }
+  return null;
+}
+function simPickTopics(slot, used, recent, pool){
+  const base = pool.filter(q => !used.has(q.id) && q.type === slot.t);
+  if(!base.length) return null;
+  const d = base.filter(q => q.difficulty === slot.d);
+  let c = d.length ? d : base;
+  const fresh = c.filter(q => !recent.has(q.id) && !(progress.solved[q.id] && progress.solved[q.id].status));
+  const notRecent = c.filter(q => !recent.has(q.id));
+  c = fresh.length ? fresh : (notRecent.length ? notRecent : c);
+  return c[Math.floor(Math.random() * c.length)];
+}
+function simNew(){
+  simLoad();
+  const used = new Set(), recent = new Set(SIM.recent), items = [];
+  const topicos = SIM.mode === "t";
+  let pool = null;
+  if(topicos){ if(!simPoolInfo(SIM.sel).ok) return false; pool = simPool(SIM.sel); }
+  SIM_SLOTS.forEach((s, i) => {
+    const q = topicos ? simPickTopics(s, used, recent, pool) : simPick(s, used, recent);
+    if(!q) return;
+    used.add(q.id);
+    items.push({i:i + 1, a:topicos ? simArea(q) : s.a, t:s.t, p:s.p, r:s.r, qid:q.id});
+  });
+  if(items.length !== SIM_SLOTS.length) return false;
+  SIM.recent = SIM.recent.concat(items.map(x => x.qid)).slice(-90);
+  SIM.cur = {id:Date.now().toString(36), t0:Date.now(), timer:!!SIM.timer, md:topicos ? "t" : "g", sel:topicos ? SIM.sel.slice() : [], items:items, ans:{}, self:{}, state:"answering"};
+  SIM.view = "test";
+  simSave();
+  return true;
+}
+function simAnswered(cur){
+  return cur.items.filter(it => {
+    const a = cur.ans[it.qid]; if(!a) return false;
+    if(it.t === "mcq") return a.o != null;
+    return String(a.v || "").trim() !== "";
+  }).length;
+}
+/* ---------- correção e cotação ---------- */
+function simScore(cur){
+  const rows = cur.items.map((it, idx) => {
+    const q = Q_BY_ID.get(it.qid) || {}, a = cur.ans[it.qid] || {};
+    let got = 0, ok = null, pend = false;
+    if(it.t === "mcq"){ ok = a.o != null && a.o === q.correct; got = ok ? it.p : 0; }
+    else if(it.t === "numeric"){ ok = withinTolerance(parseLocaleNumber(String(a.v || "")), q.answer); got = ok ? it.p : 0; }
+    else {
+      const pct = cur.self[it.qid];
+      if(pct == null){ pend = true; got = 0; }
+      else { got = Math.round(it.p * pct / 100); ok = pct >= 50; }
+    }
+    return {it:it, q:q, a:a, got:got, ok:ok, pend:pend, counted:!!it.r, idx:idx};
+  });
+  const opt = rows.filter(r => !r.it.r).sort((x, y) => (y.got - x.got) || (x.idx - y.idx));
+  opt.forEach((r, k) => { r.counted = k < 4; });
+  let total = 0, f = 0, qm = 0, m = 0, ab = 0, pend = 0;
+  rows.forEach(r => {
+    if(r.pend) pend++;
+    if(!r.counted) return;
+    total += r.got;
+    if(r.it.a === "f") f += r.got; else qm += r.got;
+    if(r.it.t === "mcq") m += r.got; else ab += r.got;
+  });
+  return {rows:rows, total:total, f:f, q:qm, m:m, a:ab, pend:pend};
+}
+/* ---------- ações ---------- */
+function simStartClock(){
+  clearInterval(simTick); simTick = null;
+  if(!SIM.cur || SIM.cur.state !== "answering" || !SIM.cur.timer || ui.mode !== "sim" || SIM.view !== "test") return;
+  const tick = () => {
+    if(ui.mode !== "sim" || SIM.view !== "test" || !SIM.cur || SIM.cur.state !== "answering"){ clearInterval(simTick); simTick = null; return; }
+    const left = Math.max(0, SIM_MINUTES * 60 - Math.floor((Date.now() - SIM.cur.t0) / 1000));
+    const el = document.getElementById("sim-clock");
+    if(el){
+      const mm = Math.floor(left / 60), ss = left % 60;
+      el.textContent = String(mm).padStart(2, "0") + ":" + String(ss).padStart(2, "0");
+      el.classList.toggle("low", left <= 600);
+    }
+    if(left <= 0){ clearInterval(simTick); simTick = null; simFinish(true); }
+  };
+  tick(); simTick = setInterval(tick, 1000);
+}
+function simFinish(auto){
+  if(!SIM.cur || SIM.cur.state !== "answering") return;
+  SIM.cur.state = "review"; SIM.cur.t1 = Date.now(); SIM.cur.auto = !!auto;
+  SIM.view = "result";
+  try{
+    const today = new Date().toDateString();
+    if(progress.activity.indexOf(today) < 0){ progress.activity.push(today); saveProgress(progress); }
+  }catch(e){}
+  simSave(); closeSimDlg(); render(); window.scrollTo({top:0});
+}
+function simConclude(){
+  const cur = SIM.cur; if(!cur || cur.state === "done") return;
+  const S = simScore(cur);
+  cur.state = "done"; cur.res = {total:S.total, f:S.f, q:S.q, m:S.m, a:S.a};
+  const mk = cur.md === "t" ? simMask(cur.sel) : 0;
+  simAddHist({id:cur.id, t:cur.t1 || Date.now(), total:S.total, f:S.f, q:S.q, m:S.m, a:S.a, md:cur.md === "t" ? "t" : "g", mk:mk});
+  simSave();
+  ctLogRow({exercicio_id:"sim-" + cur.id, tipo:"open", resposta:"_exame_sim:" + S.total + "/" + S.f + "/" + S.q + "/" + S.m + "/" + S.a + (cur.md === "t" ? "/t" + mk.toString(36) : "/g"), certa:null, viu_resolucao:false});
+  simRerender();
+}
+function simRerender(){
+  const y = window.scrollY; render(); window.scrollTo({top:y});
+}
+function closeSimDlg(){ const d = document.getElementById("simDlg"); if(d) d.remove(); }
+function simDialog(o){
+  closeSimDlg();
+  const d = document.createElement("div"); d.id = "simDlg"; d.className = "sim-dlg";
+  d.innerHTML = `<div class="sim-dlg-box" role="dialog" aria-modal="true" aria-labelledby="simDlgT">
+      <h2 id="simDlgT">${o.title}</h2><p>${o.text}</p>
+      <div class="sim-dlg-acts"><button type="button" class="btn ghost" data-sim-dlg="no">${o.no}</button><button type="button" class="btn primary" data-sim-dlg="yes">${o.yes}</button></div></div>`;
+  d.addEventListener("click", e => {
+    const b = e.target.closest("[data-sim-dlg]");
+    if(b){ const yes = b.dataset.simDlg === "yes"; closeSimDlg(); if(yes) o.onYes(); }
+    else if(e.target === d) closeSimDlg();
+  });
+  d.addEventListener("keydown", e => { if(e.key === "Escape") closeSimDlg(); });
+  document.body.appendChild(d);
+  const f = d.querySelector('[data-sim-dlg="no"]'); if(f) f.focus();
+}
+function simUpdateBar(){
+  if(!SIM.cur) return;
+  const n = simAnswered(SIM.cur), el = document.getElementById("sim-count");
+  if(el) el.textContent = n + " de " + SIM.cur.items.length + " respondidas";
+  const bar = document.getElementById("sim-bar-fill");
+  if(bar) bar.style.width = Math.round(100 * n / SIM.cur.items.length) + "%";
+}
+
+/* ---------- interface ---------- */
+function simHomeCard(){
+  simLoad();
+  const best = SIM.hist.length ? Math.max.apply(null, SIM.hist.map(h => h.total)) : null;
+  return `<section class="sim-entry" aria-label="Simulador de Teste">
+      <div class="sim-entry-txt">
+        <span class="sim-entry-eyebrow">Novo</span>
+        <h2>Simulador de Teste</h2>
+        <p>Testes de 23 itens e 200 pontos, como o exame nacional: um <b>teste global</b> (simulação de exame) ou um teste só com os <b>tópicos que escolheres</b>. Corrigido pela app.${best != null ? ` Melhor nota: <b>${best}/${SIM_MAX}</b>.` : ""}</p>
+      </div>
+      <button type="button" class="btn primary" data-action="mode-sim">Abrir o simulador</button>
+    </section>`;
+}
+function simTipoLbl(h){
+  if(h.md !== "t") return "Global";
+  const n = simSelOf(h.mk).length;
+  return `<span title="${escapeAttr(simTopicNames(h.mk).join("; "))}">Tópicos (${n})</span>`;
+}
+function simHistTable(){
+  if(!SIM.hist.length) return `<p class="sim-muted">Ainda não fizeste nenhum teste. Depois de guardares a nota, ela aparece aqui.</p>`;
+  const best = Math.max.apply(null, SIM.hist.map(h => h.total));
+  const rows = SIM.hist.slice().reverse().slice(0, 12).map(h => `<tr>
+      <td>${ctFmtData(h.t)}</td><td>${simTipoLbl(h)}</td><td class="num"><b>${h.total}</b>/${SIM_MAX}${h.total === best ? ' <span class="sim-best">melhor</span>' : ""}</td>
+      <td class="num">${h.f}</td><td class="num">${h.q}</td><td class="num">${h.m}</td><td class="num">${h.a}</td></tr>`).join("");
+  return `<div class="sim-tablewrap"><table class="sim-table"><thead><tr><th>Data</th><th>Tipo</th><th class="num">Nota</th><th class="num">Física</th><th class="num">Química</th><th class="num" title="Pontos obtidos nos itens de escolha múltipla">Esc. múltipla</th><th class="num" title="Pontos obtidos nos itens de cálculo e de resposta aberta">Abertas</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="sim-small">Pontos por área e por tipo de item contam apenas os itens que entram na nota (os obrigatórios e os 4 melhores opcionais).</p>`;
+}
+function simMatrixHtml(){
+  const groups = [[10,"f","10.º ano · Física"],[10,"q","10.º ano · Química"],[11,"f","11.º ano · Física"],[11,"q","11.º ano · Química"]];
+  return groups.map(g => {
+    const idx = SIM_MATRIX.map((e, i) => i).filter(i => SIM_MATRIX[i].a === g[0] && SIM_MATRIX[i].s === g[1]);
+    let last = "", body = "";
+    idx.forEach(i => {
+      const e = SIM_MATRIX[i];
+      if(e.d !== last){ last = e.d; body += `<p class="sim-mx-dom">${SIM_DOMS[e.d]}</p>`; }
+      body += `<label class="sim-mx-chip"><input type="checkbox" data-action="sim-topic" data-i="${i}" ${SIM.sel.indexOf(i) >= 0 ? "checked" : ""}><span>${e.n}</span></label>`;
+    });
+    return `<fieldset class="sim-mx-g"><legend>${g[2]}</legend><button type="button" class="sim-link" data-action="sim-mx-grp" data-grp="${g[0]}${g[1]}">marcar / desmarcar todos</button>${body}</fieldset>`;
+  }).join("");
+}
+function simMxInfoHtml(){
+  const inf = simPoolInfo(SIM.sel), k = SIM.sel.length;
+  if(inf.vazio) return `<span class="sim-warn">Marca pelo menos um tópico.</span>`;
+  if(!inf.ok) return `<span class="sim-warn">Com ${k === 1 ? "este tópico" : "estes " + k + " tópicos"} não há exercícios suficientes: faltam ${inf.falta.join(", ")}. Junta mais tópicos (por exemplo, do mesmo ano).</span>`;
+  return `<span class="sim-okmsg">${k} ${k === 1 ? "tópico marcado" : "tópicos marcados"} · exercícios disponíveis: ${inf.n.mcq} de escolha múltipla, ${inf.n.numeric} de cálculo, ${inf.n.open} de resposta aberta.</span>`;
+}
+function simUpdateMx(){
+  const el = document.getElementById("sim-mx-info"); if(el) el.innerHTML = simMxInfoHtml();
+  const b = document.getElementById("sim-new-btn"); if(b) b.disabled = SIM.mode === "t" && !simPoolInfo(SIM.sel).ok;
+}
+function simRenderHome(){
+  const cur = SIM.cur;
+  let estado = "";
+  if(cur && cur.state === "answering"){
+    estado = `<div class="sim-card sim-resume"><h3>Tens um teste por terminar</h3>
+        <p>${simAnswered(cur)} de ${cur.items.length} respondidas · começou ${ctFmtData(cur.t0)}${cur.timer ? " · com cronómetro" : ""}.</p>
+        <div class="sim-row"><button type="button" class="btn primary" data-action="sim-continue">Continuar o teste</button>
+        <button type="button" class="btn ghost" data-action="sim-abandon">Abandonar</button></div></div>`;
+  } else if(cur && cur.state === "review"){
+    estado = `<div class="sim-card sim-resume"><h3>Falta guardar a nota do último teste</h3>
+        <p>Entregaste o teste mas ainda não guardaste a nota (por exemplo, falta autoavaliar as respostas abertas).</p>
+        <div class="sim-row"><button type="button" class="btn primary" data-action="sim-last">Ver correção e guardar</button></div></div>`;
+  } else if(cur && cur.state === "done"){
+    estado = `<div class="sim-card"><h3>Último teste: ${cur.res.total}/${SIM_MAX}</h3>
+        <div class="sim-row"><button type="button" class="btn ghost" data-action="sim-last">Rever a correção</button></div></div>`;
+  }
+  const t = SIM.mode === "t", bloq = t && !simPoolInfo(SIM.sel).ok;
+  const pedir = cur && cur.state === "answering" ? "" : `<div class="sim-card">
+      <h3>Pedir um teste</h3>
+      <p class="sim-small sim-first">Estrutura sempre igual: 23 itens (15 de escolha múltipla, 6 de cálculo e 2 de resposta aberta) e 200 pontos.</p>
+      <div class="sim-modes" role="radiogroup" aria-label="Tipo de teste">
+        <button type="button" class="sim-mode ${t ? "" : "on"}" role="radio" aria-checked="${!t}" data-action="sim-mode" data-mode="g"><b>Teste global</b><span>Simulação de exame, com todos os conteúdos do 10.º e do 11.º ano (12 itens de Física e 11 de Química).</span></button>
+        <button type="button" class="sim-mode ${t ? "on" : ""}" role="radio" aria-checked="${t}" data-action="sim-mode" data-mode="t"><b>Escolher tópicos</b><span>Só com os tópicos que marcares na matriz, de Física e/ou de Química.</span></button>
+      </div>
+      ${t ? `<div class="sim-matrix"><div class="sim-mx-top"><b>Matriz de tópicos</b><span><button type="button" class="sim-link" data-action="sim-mx-all">marcar tudo</button> · <button type="button" class="sim-link" data-action="sim-mx-none">limpar</button></span></div>${simMatrixHtml()}<p class="sim-mx-info" id="sim-mx-info" aria-live="polite">${simMxInfoHtml()}</p></div>` : ""}
+      <label class="sim-check"><input type="checkbox" id="sim-timer" data-action="sim-timer" ${SIM.timer ? "checked" : ""}> Contar o tempo (${SIM_MINUTES} minutos, como no exame)</label>
+      <div class="sim-row"><button type="button" class="btn primary" id="sim-new-btn" data-action="sim-new" ${bloq ? "disabled" : ""}>Pedir um teste</button></div>
+      <p class="sim-small">Cada teste tem perguntas diferentes, sorteadas do banco de exercícios e evitando as dos testes anteriores.</p></div>`;
+  return pageHero("exams", "Simulador de Teste", "Treina com um teste global (simulação de exame) ou só com os tópicos que escolheres: 23 itens e 200 pontos, com correção automática.",
+      SIM.hist.length ? {num:Math.max.apply(null, SIM.hist.map(h => h.total)), den:SIM_MAX, label:"melhor nota"} : null) + `
+    <div class="sim-wrap">
+      ${estado}${pedir}
+      <div class="sim-card"><h3>Como funciona</h3><ul class="sim-list">
+        <li><b>23 itens:</b> 15 de escolha múltipla, 6 de cálculo e 2 de resposta aberta. Os 15 itens obrigatórios valem 160 pontos; dos 8 opcionais contam os <b>4 melhores</b> (40 pontos). No teste global, a divisão entre Física e Química é a do exame de 2026.</li>
+        <li><b>Correção:</b> as escolhas múltiplas e os itens de cálculo (resultado final) são corrigidos pela app. Nos 2 itens de resposta aberta comparas com a resolução e atribuis a tua cotação.</li>
+        <li><b>Cotação:</b> cada item vale 10 ou 12 pontos, tudo ou nada nos itens corrigidos pela app. No exame real os cálculos também valem pelas etapas, por isso a nota verdadeira pode ser um pouco mais alta.</li>
+        <li><b>Material:</b> tabela periódica (botão no canto do ecrã) e calculadora, como no exame.</li></ul></div>
+      <div class="sim-card"><h3>Os meus testes</h3>${simHistTable()}</div>
+      <div class="sim-row"><button type="button" class="btn ghost" data-action="sim-exit">← Voltar aos tópicos</button></div>
+    </div>`;
+}
+function simItemHead(it, n){
+  const area = it.a === "f" ? `<span class="sim-chip phys">Física</span>` : `<span class="sim-chip chem">Química</span>`;
+  return `<div class="sim-item-head"><span class="sim-num mono">${n}</span>${area}<span class="sim-chip">${SIM_TYPE_LBL[it.t]}</span>
+    <span class="sim-chip ${it.r ? "req" : "opt"}">${it.r ? "Obrigatório" : "Opcional"}</span><span class="sim-pts">${it.p} pontos</span></div>`;
+}
+function simRenderTest(){
+  const cur = SIM.cur, L = ["A", "B", "C", "D", "E"];
+  const items = cur.items.map((it, k) => {
+    const q = Q_BY_ID.get(it.qid), a = cur.ans[it.qid] || {};
+    let inter = "";
+    if(it.t === "mcq"){
+      inter = `<div class="options">${q.options.map((o, i) => `<button type="button" class="opt ${a.o === i ? "chosen" : ""}" data-action="sim-opt" data-qid="${q.id}" data-opt="${i}" aria-pressed="${a.o === i}"><span class="opt-letter">${L[i]}</span><span>${o}</span></button>`).join("")}</div>`;
+    } else if(it.t === "numeric"){
+      inter = `<div class="numeric-row"><input type="text" inputmode="decimal" id="sim-in-${q.id}" data-sim-num="${q.id}" placeholder="resultado" value="${escapeAttr(a.v || "")}" autocomplete="off"><span class="unit mono">${q.unit || ""}</span></div>
+        <p class="sim-small">Escreve só o resultado final, com a unidade pedida no enunciado.</p>`;
+    } else {
+      inter = `<div class="open-row"><textarea rows="5" id="sim-in-${q.id}" data-sim-txt="${q.id}" placeholder="Escreve aqui a tua resposta (ou resolve no caderno)…">${escapeHtml(a.v || "")}</textarea></div>`;
+    }
+    return `<article class="sim-item" id="sim-it-${it.i}">${simItemHead(it, it.i)}<div class="sim-prompt">${q.prompt}</div>${inter}</article>`;
+  }).join("");
+  return `<div class="sim-wrap sim-test">
+    <div class="sim-bar" role="region" aria-label="Estado do teste">
+      <div class="sim-bar-main"><b>${cur.md === "t" ? "Teste por tópicos" : "Teste global"}</b><span id="sim-count" class="sim-muted"></span>
+        ${cur.timer ? `<span class="sim-clock mono" id="sim-clock" role="timer" aria-label="Tempo restante">--:--</span>` : ""}
+        <button type="button" class="btn primary" data-action="sim-submit">Entregar</button></div>
+      <div class="sim-bar-track"><i id="sim-bar-fill"></i></div></div>
+    <p class="sim-small sim-intro">Os 15 itens obrigatórios valem 160 pontos. Dos 8 opcionais contam os 4 melhores, por isso responde a todos. Só vês a correção depois de entregares.</p>
+    ${items}
+    <div class="sim-row sim-end"><button type="button" class="btn primary" data-action="sim-submit">Entregar o teste</button></div></div>`;
+}
+function simPlain(h){ return String(h == null ? "" : h); }
+function simRenderResult(){
+  const cur = SIM.cur, S = simScore(cur), L = ["A", "B", "C", "D", "E"];
+  const done = cur.state === "done";
+  const pct = Math.round(100 * S.total / SIM_MAX);
+  const min = cur.t1 ? Math.max(1, Math.round((cur.t1 - cur.t0) / 60000)) : null;
+  const rev = S.rows.map(r => {
+    const it = r.it, q = r.q, a = r.a;
+    let tua = "", cert = "";
+    if(it.t === "mcq"){
+      tua = a.o != null ? `(${L[a.o]}) ${q.options[a.o]}` : `<i>Sem resposta</i>`;
+      cert = `(${L[q.correct]}) ${q.options[q.correct]}`;
+    } else if(it.t === "numeric"){
+      tua = String(a.v || "").trim() ? escapeHtml(a.v) + (q.unit ? " " + q.unit : "") : `<i>Sem resposta</i>`;
+      cert = q.answer + (q.unit ? " " + q.unit : "");
+    } else {
+      tua = String(a.v || "").trim() ? `<span class="sim-pre">${escapeHtml(a.v)}</span>` : `<i>Sem resposta</i>`;
+    }
+    const estado = r.pend ? `<span class="sim-st pend">por avaliar</span>` : (r.ok ? `<span class="sim-st ok">✓</span>` : `<span class="sim-st no">✕</span>`);
+    const conta = it.r ? "" : ((r.counted && r.got > 0) ? `<span class="sim-chip cnt">conta</span>` : `<span class="sim-chip">não conta</span>`);
+    let self = "";
+    if(it.t === "open"){
+      self = `<div class="sim-self"><p><b>Compara com a resolução e atribui a tua cotação:</b></p><div class="sim-self-row">${SIM_LEVELS.map(l => {
+        const pts = Math.round(it.p * l[0] / 100), on = cur.self[it.qid] === l[0];
+        return `<button type="button" class="sim-lv ${on ? "on" : ""}" data-action="sim-self" data-qid="${q.id}" data-pct="${l[0]}" aria-pressed="${on}" ${done ? "disabled" : ""}><b>${pts}</b><span>${l[1]}</span></button>`;
+      }).join("")}</div></div>`;
+    }
+    return `<details class="sim-rev ${r.pend ? "pend" : (r.ok ? "ok" : "no")}" ${it.t === "open" && r.pend ? "open" : ""}>
+      <summary><span class="sim-num mono">${it.i}</span>${estado}<span class="sim-rev-t">${it.a === "f" ? "Física" : "Química"} · ${SIM_TYPE_LBL[it.t]}</span>${conta}<span class="sim-rev-p mono">${r.got}/${it.p}</span></summary>
+      <div class="sim-rev-body"><div class="sim-prompt">${q.prompt}</div>
+        <p class="sim-ans"><b>A tua resposta:</b> ${tua}</p>
+        ${cert ? `<p class="sim-ans"><b>Resposta correta:</b> ${cert}</p>` : ""}
+        <div class="sim-expl"><b>Resolução</b><div class="expl">${q.expl}</div></div>${self}</div></details>`;
+  }).join("");
+  const aviso = S.pend ? `<div class="sim-note warn">Falta autoavaliar ${S.pend} ${S.pend === 1 ? "item de resposta aberta" : "itens de resposta aberta"} (abre-os abaixo). Enquanto isso contam 0 pontos, por isso a nota é <b>provisória</b>.</div>` : "";
+  const bar = (v, c) => `<span class="sim-mbar"><i class="${c}" style="width:${Math.min(100, Math.round(100 * v / SIM_MAX))}%"></i></span>`;
+  return `<div class="sim-wrap">
+    <section class="sim-score ${done ? "done" : ""}" aria-label="Resultado do teste">
+      <div class="sim-score-k">${cur.md === "t" ? "Teste por tópicos" : "Teste global (simulação de exame)"}</div>
+      <div class="sim-score-n"><span class="mono">${S.total}</span><small>/ ${SIM_MAX} pontos</small></div>
+      ${cur.md === "t" ? `<div class="sim-score-tp">${simTopicNames(simMask(cur.sel)).map(n => `<span class="sim-chip">${escapeHtml(n)}</span>`).join("")}</div>` : ""}<div class="sim-score-s">${pct}% · equivale a <b>${(S.total / 10).toFixed(1).replace(".", ",")}</b> valores (escala 0–20)${min ? ` · ${min} min` : ""}${cur.auto ? " · tempo esgotado" : ""}</div>
+      <div class="sim-split"><div><span>Física</span><b class="mono">${S.f}</b>${bar(S.f, "phys")}</div><div><span>Química</span><b class="mono">${S.q}</b>${bar(S.q, "chem")}</div>
+        <div><span>Escolha múltipla</span><b class="mono">${S.m}</b>${bar(S.m, "neu")}</div><div><span>Cálculo e respostas abertas</span><b class="mono">${S.a}</b>${bar(S.a, "neu")}</div></div>
+    </section>
+    ${aviso}
+    <div class="sim-row">${done ? `<span class="sim-saved">✓ Nota guardada</span>` : `<button type="button" class="btn primary" data-action="sim-save">Guardar a minha nota (${S.total}/${SIM_MAX})</button>`}
+      <button type="button" class="btn ghost" data-action="sim-new">Pedir outro teste</button><button type="button" class="btn ghost" data-action="sim-home">Voltar ao simulador</button></div>
+    <h2 class="sim-h2">Correção item a item</h2>
+    <p class="sim-small">Os 4 melhores itens opcionais estão marcados com «conta». Abre cada item para ver o enunciado e a resolução.</p>
+    <div class="sim-revlist">${rev}</div></div>`;
+}
+function simRender(){
+  simLoad();
+  if(SIM.cur && SIM.cur.state === "answering" && SIM.cur.timer && Date.now() - SIM.cur.t0 > SIM_MINUTES * 60000 && SIM.view !== "home"){ simFinish(true); return; }
+  if(SIM.view === "test" && !(SIM.cur && SIM.cur.state === "answering")) SIM.view = "home";
+  if(SIM.view === "result" && !SIM.cur) SIM.view = "home";
+  const h = SIM.view === "test" ? simRenderTest() : (SIM.view === "result" ? simRenderResult() : simRenderHome());
+  app.innerHTML = h;
+  const hd = document.querySelector("header.top");
+  document.documentElement.style.setProperty("--sim-top", (hd ? Math.round(hd.getBoundingClientRect().height) : 0) + "px");
+  if(SIM.view === "test"){ simUpdateBar(); simStartClock(); } else { clearInterval(simTick); simTick = null; }
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener("click", function(e){
+  const el = e.target.closest("[data-action]"); if(!el) return;
+  const act = el.dataset.action; if(act.indexOf("sim-") !== 0 && act !== "mode-sim") return;
+  simLoad();
+  if(act === "mode-sim"){
+    ui.mode = "sim"; SIM.view = "home"; render(); window.scrollTo({top:0, behavior:"smooth"});
+  } else if(act === "sim-exit"){ ui.mode = "topics"; ui.view = "home"; render(); window.scrollTo({top:0});
+  } else if(act === "sim-home"){ SIM.view = "home"; render(); window.scrollTo({top:0});
+  } else if(act === "sim-timer"){ SIM.timer = !!el.checked; simSave();
+  } else if(act === "sim-mode"){ SIM.mode = el.dataset.mode === "t" ? "t" : "g"; simSave(); simRerender();
+  } else if(act === "sim-topic"){
+    const i = +el.dataset.i, k = SIM.sel.indexOf(i);
+    if(el.checked && k < 0) SIM.sel.push(i); else if(!el.checked && k >= 0) SIM.sel.splice(k, 1);
+    SIM.sel.sort((a, b) => a - b); simSave(); simUpdateMx();
+  } else if(act === "sim-mx-all" || act === "sim-mx-none" || act === "sim-mx-grp"){
+    let idx = SIM_MATRIX.map((e, i) => i);
+    if(act === "sim-mx-grp"){ const g = el.dataset.grp; idx = idx.filter(i => String(SIM_MATRIX[i].a) + SIM_MATRIX[i].s === g); }
+    if(act === "sim-mx-none") SIM.sel = [];
+    else if(act === "sim-mx-all") SIM.sel = idx;
+    else { const all = idx.every(i => SIM.sel.indexOf(i) >= 0); SIM.sel = SIM.sel.filter(i => idx.indexOf(i) < 0); if(!all) SIM.sel = SIM.sel.concat(idx); SIM.sel.sort((a, b) => a - b); }
+    simSave(); document.querySelectorAll('input[data-action="sim-topic"]').forEach(c => { c.checked = SIM.sel.indexOf(+c.dataset.i) >= 0; }); simUpdateMx();
+  } else if(act === "sim-new"){
+    const go = () => { if(!simNew()){ simUpdateMx(); return; } render(); window.scrollTo({top:0}); };
+    if(SIM.cur && SIM.cur.state === "answering"){
+      simDialog({title:"Começar um novo teste?", text:"O teste em curso será descartado.", no:"Cancelar", yes:"Novo teste", onYes:go});
+    } else if(SIM.cur && SIM.cur.state === "review"){
+      simDialog({title:"Descartar o teste anterior?", text:"A nota do último teste ainda não foi guardada e será perdida.", no:"Cancelar", yes:"Descartar e continuar", onYes:go});
+    } else go();
+  } else if(act === "sim-continue"){ SIM.view = "test"; render(); window.scrollTo({top:0});
+  } else if(act === "sim-last"){ SIM.view = "result"; render(); window.scrollTo({top:0});
+  } else if(act === "sim-abandon"){
+    simDialog({title:"Abandonar o teste?", text:"As respostas dadas serão perdidas.", no:"Cancelar", yes:"Abandonar", onYes:() => { SIM.cur = null; simSave(); render(); }});
+  } else if(act === "sim-opt"){
+    const cur = SIM.cur; if(!cur || cur.state !== "answering") return;
+    const qid = el.dataset.qid, i = +el.dataset.opt;
+    cur.ans[qid] = {o:i}; simSave();
+    el.closest(".options").querySelectorAll(".opt").forEach(b => { const on = b === el; b.classList.toggle("chosen", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
+    simUpdateBar();
+  } else if(act === "sim-submit"){
+    const cur = SIM.cur; if(!cur || cur.state !== "answering") return;
+    const falta = cur.items.length - simAnswered(cur);
+    simDialog({title:"Entregar o teste?", text:falta ? `Ainda tens <b>${falta}</b> ${falta === 1 ? "item" : "itens"} sem resposta. Depois de entregares não podes alterar as respostas.` : "Depois de entregares não podes alterar as respostas.", no:"Continuar a responder", yes:"Entregar", onYes:() => simFinish(false)});
+  } else if(act === "sim-self"){
+    const cur = SIM.cur; if(!cur || cur.state === "done") return;
+    cur.self[el.dataset.qid] = +el.dataset.pct; simSave();
+    const open = Array.from(document.querySelectorAll(".sim-rev[open]")).map(d => d.querySelector(".sim-num").textContent);
+    simRerender();
+    open.forEach(n => { const d = Array.from(document.querySelectorAll(".sim-rev")).find(x => x.querySelector(".sim-num").textContent === n); if(d) d.open = true; });
+  } else if(act === "sim-save"){ simConclude(); }
+});
+document.addEventListener("input", function(e){
+  const t = e.target; if(!t || !t.dataset) return;
+  const qid = t.dataset.simNum || t.dataset.simTxt; if(!qid || !SIM.cur || SIM.cur.state !== "answering") return;
+  SIM.cur.ans[qid] = {v:t.value};
+  clearTimeout(simSave._t); simSave._t = setTimeout(simSave, 400);
+  simUpdateBar();
+});
 
   /* ---------- App instalável (PWA) ---------- */
   (function pwaInit(){
