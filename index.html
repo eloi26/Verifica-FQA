@@ -5752,7 +5752,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
     tab: "entrar",       // entrar | primeira | prof
     step: 1,             // 1 = dados · 2 = privacidade (só em "primeira")
     busy: false, err: "", info: "",
-    f: { codigo: "", alcunha: "", pin: "", pin2: "", email: "", senha: "", ok: false },
+    f: ctFresh(), focusPin: !!ctRemLoad(),
     queue: [], flushing: false, lastErr: "",
     offerImport: 0,
     prof: { turmas: [], turmaId: null, alunos: [], rows: [], loading: false, err: "", msg: "", showNew: false,
@@ -5788,6 +5788,11 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
   function ctLoadInat(){ try{ const n = parseInt(localStorage.getItem("fqa_conta_inat_dias"), 10); return [3, 7, 14, 30].indexOf(n) >= 0 ? n : 7; }catch(e){ return 7; } }
   function ctSaveLS(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
   function ctLoadLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  /* lembrar turma + nome neste dispositivo (nunca o PIN) */
+  function ctRemLoad(){ try{ const o = JSON.parse(ctLoadLS("fqa_conta_lembrar") || "null"); if(o && typeof o.c === "string" && typeof o.a === "string" && o.c && o.a) return o; }catch(e){} return null; }
+  function ctRemSave(c, a){ ctSaveLS("fqa_conta_lembrar", JSON.stringify({ c: String(c), a: String(a) })); }
+  function ctRemClear(){ try{ localStorage.removeItem("fqa_conta_lembrar"); }catch(e){} }
+  function ctFresh(){ const r = ctRemLoad(); return { codigo: r ? r.c : "", alcunha: r ? r.a : "", pin: "", pin2: "", email: "", senha: "", ok: false }; }
 
   /* ---------- armazenamento por utilizador ---------- */
   function switchStorage(uid){
@@ -6100,7 +6105,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
   function localLogout(){
     conta.user = null; conta.perfil = null; conta.turma = null; conta.offerImport = 0;
     conta.prof.turmas = []; conta.prof.alunos = []; conta.prof.rows = []; conta.prof.turmaId = null; conta.prof.pinMsg = ""; conta.prof.confirm = null;
-    conta.f = { codigo: "", alcunha: "", pin: "", pin2: "", email: "", senha: "", ok: false };
+    conta.f = ctFresh(); conta.focusPin = true;
     conta.step = 1; conta.tab = "entrar";
     switchStorage(null);
     if(ui.mode === "turma") ui.mode = "topics";
@@ -6143,6 +6148,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
       if(r.error) throw r.error;
       conta.f.pin = ""; conta.f.pin2 = "";
       await afterSignIn(r.data.user, codigo, alc);
+      ctRemSave(codigo, alc);
     }catch(err){ conta.busy = false; conta.err = err && err.plain ? err.message : mapErr(err); render(); }
   }
   async function actContinuar(){
@@ -6171,6 +6177,7 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
       if(!r.data.session){ throw new Error("O servidor exige confirmação por email. Avisa o professor."); }
       conta.f.pin = ""; conta.f.pin2 = "";
       await afterSignIn(r.data.user, codigo, alc);
+      ctRemSave(codigo, alc);
     }catch(err){
       conta.busy = false;
       conta.err = err && err.plain ? err.message : mapErr(err);
@@ -6223,7 +6230,8 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
         <p class="ct-muted">O teu progresso fica guardado e acompanha-te no telemóvel e no computador.</p>
         ${tabs}${campos(false)}${err}
         <button type="button" class="btn primary ct-big" data-action="conta-entrar" data-primary ${dis}>${conta.busy ? "A entrar…" : "Entrar"}</button>
-        <p class="ct-small">Esqueceste o PIN? Pede ao professor para o repor.</p>`;
+        <p class="ct-small">Esqueceste o PIN? Pede ao professor para o repor.</p>
+        ${ctRemLoad() ? `<p class="ct-small">Neste dispositivo: <b>${ctEsc(ctRemLoad().a)}</b>. <button type="button" class="ct-link" data-action="conta-outro" ${dis}>Não és tu? Usar outro nome</button></p>` : ""}`;
     } else if(conta.tab === "primeira" && conta.step === 1){
       corpo = `<h1 class="ct-h1">Cria a tua conta</h1>
         <p class="ct-muted">Precisas do código da turma. Escreve o teu primeiro nome e o apelido (ou a inicial do apelido), e escolhe um PIN de 6 dígitos que consigas lembrar.</p>
@@ -6266,6 +6274,10 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
         <button type="button" class="ct-link" data-action="conta-tab" data-tab="prof">Sou professor</button>
       </div>`;
     el.innerHTML = `<div class="ct-card">${corpo}${rodape}</div>`;
+    if(conta.focusPin && conta.tab === "entrar" && f.codigo && f.alcunha){
+      conta.focusPin = false;
+      const pn = document.getElementById("auth-pin"); if(pn){ try{ pn.focus(); }catch(e){} }
+    }
   }
 
   /* ---------- barra da conta ---------- */
@@ -6730,7 +6742,13 @@ LAB_EXERCISES.push(...[{"id":50,"subject":"quimica","titulo":"Picnometria: ident
     const a = el.dataset.action;
     if(a === "mode-turma"){ ui.mode = "turma"; render(); window.scrollTo({ top: 0, behavior: "smooth" }); if(!conta.prof.loadedAt) profLoadTurmas(); return; }
     if(a.indexOf("conta-") !== 0) return;
-    if(a === "conta-tab"){ readForm(); conta.tab = el.dataset.tab; conta.step = 1; conta.err = ""; render(); }
+    if(a === "conta-tab"){
+      readForm(); conta.tab = el.dataset.tab; conta.step = 1; conta.err = "";
+      if(conta.tab === "primeira"){ const r = ctRemLoad(); if(r && ctNormCode(conta.f.codigo) === ctNormCode(r.c) && String(conta.f.alcunha).trim() === r.a){ conta.f.codigo = ""; conta.f.alcunha = ""; } }
+      else if(conta.tab === "entrar"){ const r = ctRemLoad(); if(r && !conta.f.codigo && !conta.f.alcunha){ conta.f.codigo = r.c; conta.f.alcunha = r.a; } }
+      render();
+    }
+    else if(a === "conta-outro"){ ctRemClear(); conta.f.codigo = ""; conta.f.alcunha = ""; conta.f.pin = ""; conta.err = ""; render(); }
     else if(a === "conta-entrar") actLogin();
     else if(a === "conta-continuar") actContinuar();
     else if(a === "conta-criar") actCriar();
